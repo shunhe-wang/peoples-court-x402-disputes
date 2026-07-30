@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "id": "peoples-court-x402-disputes-conformance",
+  "version": 1,
+  "kind": "implementation-behavior-index",
+  "protocol": "x402-v2",
+  "extensionKey": "peoples-court-dispute",
+  "cases": [
+    {
+      "id": "PCD-DECL-001",
+      "area": "declaration",
+      "expect": "accept",
+      "description": "A complete version 1 declaration is accepted."
+    },
+    {
+      "id": "PCD-DECL-002",
+      "area": "declaration",
+      "expect": "reject",
+      "expectedError": "declaration.automaticRefund is not supported",
+      "description": "Unknown declaration fields are rejected."
+    },
+    {
+      "id": "PCD-ACCEPT-001",
+      "area": "acceptance",
+      "expect": "accept",
+      "description": "An explicit acceptance bound to the presented resource and payment requirement is accepted."
+    },
+    {
+      "id": "PCD-ACCEPT-002",
+      "area": "acceptance",
+      "expect": "reject",
+      "expectedError": "acceptance.statement.resourceUrl does not match",
+      "description": "Replaying an acceptance against a different resource is rejected."
+    },
+    {
+      "id": "PCD-ACCEPT-003",
+      "area": "acceptance",
+      "expect": "reject",
+      "expectedError": "acceptance.statement.paymentRequirementHash does not match",
+      "description": "Reusing an acceptance after the payment requirement changes is rejected."
+    },
+    {
+      "id": "PCD-ACCEPT-004",
+      "area": "acceptance",
+      "expect": "reject",
+      "expectedError": "acceptance.proof is required",
+      "description": "A payment with a missing acceptance proof is rejected before verification."
+    },
+    {
+      "id": "PCD-PACKET-001",
+      "area": "packet",
+      "expect": "accept",
+      "description": "A canonical ordinary-x402 packet with partner execution is accepted."
+    },
+    {
+      "id": "PCD-PACKET-002",
+      "area": "packet",
+      "expect": "reject",
+      "expectedError": "packet receipt payload does not match the settlement",
+      "description": "A signed receipt whose payload conflicts with settlement is rejected."
+    },
+    {
+      "id": "PCD-PACKET-003",
+      "area": "packet",
+      "expect": "reject",
+      "expectedError": "packet exceeds 131072 canonical bytes",
+      "description": "A packet larger than the canonical byte limit is rejected."
+    },
+    {
+      "id": "PCD-EXEC-001",
+      "area": "execution",
+      "expect": "reject",
+      "expectedError": "An ordinary x402 packet cannot claim x402r ownership.",
+      "description": "An ordinary-x402 packet cannot name x402r as execution owner."
+    },
+    {
+      "id": "PCD-EXEC-002",
+      "area": "execution",
+      "expect": "reject",
+      "expectedError": "An ordinary x402 packet cannot claim x402r execution.",
+      "description": "An ordinary-x402 packet cannot select x402r execution."
+    },
+    {
+      "id": "PCD-EXEC-003",
+      "area": "execution",
+      "expect": "accept",
+      "description": "An actual x402r packet preserves x402r as both rail and execution mode."
+    },
+    {
+      "id": "PCD-EVIDENCE-001",
+      "area": "testnet-evidence",
+      "expect": "accept",
+      "description": "A Base Sepolia evidence record is accepted offline when its packet and transaction bindings are intact."
+    },
+    {
+      "id": "PCD-EVIDENCE-002",
+      "area": "testnet-evidence",
+      "expect": "reject",
+      "expectedError": "packet settlement transaction does not match evidence.transactionHash",
+      "description": "A Base Sepolia evidence record is rejected when its transaction hash conflicts with the packet settlement."
+    },
+    {
+      "id": "PCD-EVIDENCE-003",
+      "area": "testnet-evidence",
+      "expect": "accept",
+      "description": "Online verification accepts a mined Base Sepolia transaction with one matching token Transfer."
+    },
+    {
+      "id": "PCD-EVIDENCE-004",
+      "area": "testnet-evidence",
+      "expect": "reject",
+      "expectedError": "RPC endpoint is not Base Sepolia",
+      "description": "Online verification rejects an RPC endpoint on the wrong chain."
+    },
+    {
+      "id": "PCD-EVIDENCE-005",
+      "area": "testnet-evidence",
+      "expect": "reject",
+      "expectedError": "transaction was not found",
+      "description": "Online verification rejects a transaction hash absent from the selected Base Sepolia view."
+    },
+    {
+      "id": "PCD-EVIDENCE-006",
+      "area": "testnet-evidence",
+      "expect": "reject",
+      "expectedError": "transaction receipt is not successful",
+      "description": "Online verification rejects a reverted transaction."
+    },
+    {
+      "id": "PCD-EVIDENCE-007",
+      "area": "testnet-evidence",
+      "expect": "reject",
+      "expectedError": "receipt must contain exactly one ERC-20 Transfer matching",
+      "description": "Online verification rejects a successful transaction whose token transfer does not match the packet."
+    },
+    {
+      "id": "PCD-EVIDENCE-008",
+      "area": "testnet-evidence",
+      "expect": "reject",
+      "expectedError": "eth_chainId failed",
+      "description": "Online verification rejects a JSON-RPC error response."
+    }
+  ]
+}
