@@ -223,7 +223,7 @@ export interface X402AwardReportRequest<TAward = Record<string, unknown>> {
 export interface X402ServedAwardVerification {
   verified: true;
   caseId: string;
-  externalCaseId: string;
+  transactionId: string;
   awardHash: string;
   manifestId: string;
   awardRevision: number;

@@ -23,6 +23,7 @@ testnet transaction, outreach, or upstream submission.
 - `package-lock.json`
 - `tsconfig.json`
 - `LICENSE`
+- `NOTICE`
 - `README.md`
 - `PROTOCOL.md`
 - `CONFORMANCE.md`
