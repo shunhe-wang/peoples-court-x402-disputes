@@ -6,12 +6,11 @@ It lets a resource server advertise bounded dispute terms, requires the payer to
 
 The package does not replace x402, act as a facilitator, reverse a payment, hold funds, or create a case from an API key alone.
 
-Status: public Apache-2.0 source release at `0.1.0`. The npm package remains
-unpublished.
+Status: public Apache-2.0 SDK. Version `0.1.0` is the initial npm release.
 
 This repository is the standalone integration SDK. The monorepo copy remains
-marked private. npm publication, deployment, and any external listing remain
-separate release gates.
+marked private. Package publication does not deploy the hosted service or
+authorize an external listing.
 
 The local compatibility matrix covers Node 20 and 22 with `@x402/core` and `@x402/extensions` `2.19.x` and `2.20.x`.
 
@@ -304,10 +303,7 @@ Read:
 - [SECURITY.md](SECURITY.md) for the trust and deployment boundaries;
 - [TESTNET.md](TESTNET.md) for the no-secret Base Sepolia evidence verifier;
 - [LICENSE](LICENSE) for the Apache License 2.0 terms;
-- [LICENSE-DECISION.md](LICENSE-DECISION.md) for the licensing boundary and
-  rationale;
-- [TRADEMARKS.md](TRADEMARKS.md) for the People’s Court brand boundary; and
-- [PUBLICATION.md](PUBLICATION.md) for the remaining release gates.
+- [TRADEMARKS.md](TRADEMARKS.md) for the People’s Court brand boundary.
 
 ## License and product boundary
 

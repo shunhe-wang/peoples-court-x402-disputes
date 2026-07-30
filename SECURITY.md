@@ -2,8 +2,8 @@
 
 ## Current status
 
-This source repository is public. The package remains unpublished on npm and
-undeployed.
+This source repository and SDK package are public. The SDK is not a deployed
+service.
 
 It has not received a professional external security audit or jurisdiction-specific legal review.
 
