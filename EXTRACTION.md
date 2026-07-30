@@ -1,10 +1,11 @@
 # Standalone repository extraction manifest
 
-Status: approved private-repository extraction as of 2026-07-30.
+Status: approved public-source extraction as of 2026-07-30.
 
-Apache-2.0 activation and private-repository extraction are approved.
-This manifest does not authorize public visibility, npm release, deployment,
-testnet transaction, outreach, or upstream submission.
+Apache-2.0 activation, standalone extraction, and public repository visibility
+are approved.
+This manifest does not authorize npm release, deployment, testnet transaction,
+outreach, or upstream submission.
 
 ## Copy into the dedicated repository
 
@@ -51,7 +52,7 @@ The application repository should retain its cross-surface type and Partner API 
 
 ## Standalone substitutions
 
-The standalone private repository uses the approved Apache-2.0, author,
+The standalone public repository uses the approved Apache-2.0, author,
 repository, homepage, bugs, keyword, and public-provenance metadata.
 It removes `private: true` so the package can be validated as publishable, but
 must not be published until the npm gate is separately approved.
@@ -75,7 +76,7 @@ The gate builds the package, runs the public behavioral and conformance tests, p
 
 ## External gates still required
 
-- final sw approval for public repository visibility and npm publication
+- final approval for npm publication
 - scoped protocol, security, privacy, and legal review
 - one approved Base Sepolia evidence run
 - a controlled Partner API test integration

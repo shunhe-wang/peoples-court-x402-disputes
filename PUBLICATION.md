@@ -1,9 +1,9 @@
 # Publication status and metadata
 
-Apache-2.0, the package identity, and the private GitHub repository are
+Apache-2.0, the package identity, and the public GitHub source repository are
 approved.
-The package remains unpublished on npm, and the repository must remain private
-until a separate public-release checkpoint.
+The public-source checkpoint was completed on 2026-07-30. The package remains
+unpublished on npm.
 
 The standalone repository uses:
 
@@ -35,17 +35,21 @@ The standalone repository uses:
 }
 ```
 
-The public-release checkpoint must still resolve:
+The npm-release checkpoint must still resolve:
 
 - ownership of the `@peoples-court` npm organization and protected publisher roles;
 - whether to add a monitored security email in addition to GitHub private
   vulnerability reporting;
 - external protocol, security, privacy, and legal review;
 - a controlled integration and approved Base Sepolia evidence run;
-- final review of the repository tree and npm tarball;
-- public repository visibility; and
+- a final repeat review of the repository tree and npm tarball immediately
+  before publication; and
 - npm publication with provenance.
 
 The monorepo package must retain `"private": true`.
 The standalone repository may omit it for publishability validation, but that
 does not authorize `npm publish`.
+
+Directory submissions, community announcements, and upstream pull requests
+also require their own approval after the repository and package URLs are
+stable.
