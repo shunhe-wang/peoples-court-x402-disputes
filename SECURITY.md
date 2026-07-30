@@ -2,8 +2,8 @@
 
 ## Current status
 
-This package is licensed locally, extracted to a private repository,
-unpublished on npm, and undeployed.
+This source repository is public. The package remains unpublished on npm and
+undeployed.
 
 It has not received a professional external security audit or jurisdiction-specific legal review.
 
@@ -83,9 +83,8 @@ packet, and rejects an adapter whose execution mode or exact declared owner
 identity does not match.
 It is never triggered by case status alone.
 
-## Operational requirements before public use
+## Operational requirements before production use
 
-- Change the dedicated repository to public only after final release review.
 - Publish releases with protected provenance.
 - Add supported-version and vulnerability-reporting policies.
 - Pin exact compatible x402 versions and test upgrades before release.
@@ -101,10 +100,9 @@ It is never triggered by case status alone.
 
 Do not open a public issue for a suspected vulnerability.
 
-While the repository is private, collaborators should use
+Use
 [GitHub Security Advisories](https://github.com/shunhe-wang/peoples-court-x402-disputes/security/advisories/new)
 to report and discuss vulnerabilities privately.
 
-Enable GitHub private vulnerability reporting before changing the repository
-to public visibility. No public security email is listed until a monitored
-mailbox is available.
+Private vulnerability reporting is enabled for the public repository. No
+public security email is listed until a monitored mailbox is available.

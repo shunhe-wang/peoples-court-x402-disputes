@@ -6,12 +6,12 @@ It lets a resource server advertise bounded dispute terms, requires the payer to
 
 The package does not replace x402, act as a facilitator, reverse a payment, hold funds, or create a case from an API key alone.
 
-Status: Apache-2.0-licensed release candidate at `0.1.0`, extracted to a
-private repository for review.
+Status: public Apache-2.0 source release at `0.1.0`. The npm package remains
+unpublished.
 
-The monorepo copy remains marked private. Public repository visibility, npm
-publication, deployment, and any external listing remain separate approval
-gates.
+This repository is the standalone integration SDK. The monorepo copy remains
+marked private. npm publication, deployment, and any external listing remain
+separate release gates.
 
 The local compatibility matrix covers Node 20 and 22 with `@x402/core` and `@x402/extensions` `2.19.x` and `2.20.x`.
 

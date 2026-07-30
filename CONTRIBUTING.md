@@ -1,8 +1,7 @@
 # Contributing
 
-Issues and technical feedback are welcome after the repository becomes
-public. Do not include secrets, private case material, personal data, or
-security vulnerabilities in a public issue.
+Issues and technical feedback are welcome. Do not include secrets, private
+case material, personal data, or security vulnerabilities in a public issue.
 
 Report suspected vulnerabilities through the private process in
 `SECURITY.md`.
