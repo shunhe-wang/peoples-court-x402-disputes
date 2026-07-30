@@ -75,9 +75,7 @@ try {
     "package/package.json",
     "package/CONFORMANCE.md",
     "package/LICENSE",
-    "package/LICENSE-DECISION.md",
     "package/NOTICE",
-    "package/PUBLICATION.md",
     "package/README.md",
     "package/PROTOCOL.md",
     "package/SECURITY.md",
@@ -104,6 +102,17 @@ try {
     false,
     "the tarball must contain only the declared release surface",
   );
+  for (const excluded of [
+    "package/EXTRACTION.md",
+    "package/LICENSE-DECISION.md",
+    "package/PUBLICATION.md",
+  ]) {
+    assert.equal(
+      entries.includes(excluded),
+      false,
+      `process-only file must not be published: ${excluded}`,
+    );
+  }
 
   mkdirSync(consumerRoot, { recursive: true });
   writeFileSync(

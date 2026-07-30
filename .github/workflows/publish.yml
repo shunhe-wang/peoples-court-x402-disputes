@@ -28,11 +28,10 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 24
-          cache: npm
+          node-version: 24.15.0
           registry-url: https://registry.npmjs.org
-      - name: Use an npm client that supports trusted publishing
-        run: npm install --global "npm@^11.15.0"
+      - name: Use the reviewed npm client
+        run: npm install --global "npm@12.0.2"
       - name: Verify the selected release
         env:
           RELEASE_ACKNOWLEDGEMENT: ${{ inputs.release_acknowledgement }}
@@ -53,7 +52,7 @@ jobs:
           fi
       - run: npm ci
       - run: npm run check
-      - run: npm audit --audit-level=high
+      - run: npm audit --audit-level=moderate
       - name: Confirm this version is unpublished
         run: |
           PACKAGE_NAME="$(node -p "require('./package.json').name")"

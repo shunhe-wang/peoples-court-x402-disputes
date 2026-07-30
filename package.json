@@ -37,9 +37,7 @@
     "conformance",
     "CONFORMANCE.md",
     "LICENSE",
-    "LICENSE-DECISION.md",
     "NOTICE",
-    "PUBLICATION.md",
     "README.md",
     "PROTOCOL.md",
     "SECURITY.md",
@@ -52,6 +50,7 @@
     "test": "node --import tsx test/index.test.ts && node --import tsx test/conformance.test.ts",
     "test:package": "node scripts/test-package.mjs",
     "check": "npm run build && npm test && npm run test:package",
+    "prepublishOnly": "npm run build && npm test",
     "prepack": "npm run build"
   },
   "engines": {
