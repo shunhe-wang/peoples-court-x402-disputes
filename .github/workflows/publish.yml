@@ -1,0 +1,73 @@
+name: Publish npm package
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_acknowledgement:
+        description: Enter the exact package and version shown in package.json
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Verify and publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: npm-release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - name: Use an npm client that supports trusted publishing
+        run: npm install --global "npm@^11.15.0"
+      - name: Verify the selected release
+        env:
+          RELEASE_ACKNOWLEDGEMENT: ${{ inputs.release_acknowledgement }}
+        run: |
+          PACKAGE_NAME="$(node -p "require('./package.json').name")"
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          EXPECTED_ACKNOWLEDGEMENT="${PACKAGE_NAME}@${PACKAGE_VERSION}"
+          EXPECTED_REF="refs/tags/v${PACKAGE_VERSION}"
+
+          if [ "$RELEASE_ACKNOWLEDGEMENT" != "$EXPECTED_ACKNOWLEDGEMENT" ]; then
+            echo "Release acknowledgement must be ${EXPECTED_ACKNOWLEDGEMENT}."
+            exit 1
+          fi
+
+          if [ "$GITHUB_REF" != "$EXPECTED_REF" ]; then
+            echo "Run this workflow from the ${EXPECTED_REF} tag."
+            exit 1
+          fi
+      - run: npm ci
+      - run: npm run check
+      - run: npm audit --audit-level=high
+      - name: Confirm this version is unpublished
+        run: |
+          PACKAGE_NAME="$(node -p "require('./package.json').name")"
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+
+          if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version >/dev/null 2>&1; then
+            echo "${PACKAGE_NAME}@${PACKAGE_VERSION} is already published."
+            exit 1
+          fi
+      - name: Inspect the npm tarball
+        run: npm pack --dry-run
+      - name: Publish with provenance
+        run: npm publish --access public --provenance
+        env:
+          # Set this only for the one-time bootstrap publication. Delete it
+          # after configuring npm trusted publishing for this workflow.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
