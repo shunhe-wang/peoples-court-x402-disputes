@@ -76,6 +76,7 @@ try {
     "package/CONFORMANCE.md",
     "package/LICENSE",
     "package/LICENSE-DECISION.md",
+    "package/NOTICE",
     "package/PUBLICATION.md",
     "package/README.md",
     "package/PROTOCOL.md",

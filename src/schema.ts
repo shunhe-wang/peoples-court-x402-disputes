@@ -9,7 +9,7 @@ const URL_SCHEMA = {
   maxLength: 2048,
   format: "uri",
   pattern:
-    "^(?:https://(?![^/?#]*@)[^\\s]+|http://(?:localhost|127\\.0\\.0\\.1|\\[::1\\])(?::[0-9]+)?(?:[/?#][^\\s]*)?)$",
+    "^(?:https://(?![^/?#]*@)[^/?#\\s]+(?:[/?#][^\\s]*)?|http://(?:localhost|127\\.0\\.0\\.1|\\[::1\\])(?::[0-9]+)?(?:[/?#][^\\s]*)?)$",
 } as const;
 
 const IDENTIFIER_SCHEMA = {

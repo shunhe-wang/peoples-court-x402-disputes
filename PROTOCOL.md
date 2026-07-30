@@ -166,10 +166,17 @@ structured binding containing:
 - the trusted signer address; and
 - the signer trust-policy ID.
 
-The helper validates those fields and cross-checks the external transaction,
+The helper validates those fields and cross-checks `transactionId` against the
+packet’s x402 transaction. That identifier is distinct from a Partner API
+`externalCaseId`. It also checks the
 execution mode, and exact execution-owner identity.
 A failed or malformed verification prevents the reporting callback from
 running.
+
+Runtime validation is authoritative for semantic and canonical constraints
+that JSON Schema cannot express or that validators may implement differently.
+Consumers of the exported schema should enable standard `uri` and `date-time`
+format validation.
 
 ## Partner API binding
 

@@ -38,6 +38,7 @@
     "CONFORMANCE.md",
     "LICENSE",
     "LICENSE-DECISION.md",
+    "NOTICE",
     "PUBLICATION.md",
     "README.md",
     "PROTOCOL.md",
@@ -63,6 +64,8 @@
   "devDependencies": {
     "@x402/core": "2.20.0",
     "@x402/extensions": "2.20.0",
+    "ajv": "8.17.1",
+    "ajv-formats": "3.0.1",
     "tsx": "^4.22.4",
     "typescript": "^5",
     "viem": "^2.50.3"

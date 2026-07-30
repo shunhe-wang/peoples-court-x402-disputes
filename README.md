@@ -232,6 +232,7 @@ const result = await reportServedX402Award(
   {
     packet,
     servedAward,
+    idempotencyKey: crypto.randomUUID(),
   },
   {
     executionMode: "partner_executes",
@@ -248,9 +249,10 @@ const result = await reportServedX402Award(
 ```
 
 The verifier must return `verified: true` and the exact structured bindings
-defined by `X402ServedAwardVerification`. A false or malformed result fails
-closed. The helper never runs automatically and refuses a mismatched execution
-owner.
+defined by `X402ServedAwardVerification`, including `transactionId` for the
+packet’s x402 transaction. That value is distinct from any Partner API
+`externalCaseId`. A false or malformed result fails closed. The helper never
+runs automatically and refuses a mismatched execution owner.
 
 ## Ordinary x402 and x402r
 
@@ -266,6 +268,17 @@ An x402r payment stays x402r and is not rerouted through the Partner API adapter
 
 The v1 declaration permits only `partner_executes` and `x402r`.
 A standard x402 payment does not prove a separate bilateral contract was funded, and the initial ordinary-x402 workflow requires a named partner execution owner.
+
+## Schema validation
+
+The exported JSON Schema is useful for early wire-shape validation. Consumers
+should enable standard `uri` and `date-time` format validation in their JSON
+Schema implementation.
+
+The package runtime validators remain authoritative. They enforce semantic and
+canonical constraints that JSON Schema implementations may treat differently,
+including URL parsing and normalization, exact cross-field bindings, packet
+size, and canonical hashing.
 
 ## Development
 

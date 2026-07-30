@@ -5,6 +5,7 @@ import {
   createReceiptEIP712,
 } from "@x402/extensions/offer-receipt";
 import Ajv2020 from "ajv/dist/2020.js";
+import addFormats from "ajv-formats";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 
 import {
@@ -316,8 +317,8 @@ async function schemaParityContract(): Promise<void> {
   const ajv = new Ajv2020({
     strict: false,
     allErrors: true,
-    validateFormats: false,
   });
+  addFormats(ajv);
   const validateSchema = ajv.compile(peopleCourtDisputeExtensionSchema);
   assert.equal(validateSchema(extension.info), true);
   assert.equal(validatePeopleCourtDisputeExtension(extension).valid, true);
@@ -353,6 +354,15 @@ async function schemaParityContract(): Promise<void> {
   rejectsInBoth((info) => {
     info.acceptance.statement.resourceUrl = "http://merchant.example/order";
   }, "a non-loopback HTTP URL");
+  rejectsInBoth((info) => {
+    info.acceptance.statement.resourceUrl = "https://?";
+  }, "a malformed HTTPS URL");
+  rejectsInBoth((info) => {
+    info.acceptance.statement.resourceUrl = "https://#fragment";
+  }, "an HTTPS URL without an authority");
+  rejectsInBoth((info) => {
+    info.acceptance.statement.resourceUrl = "https://%zz";
+  }, "an HTTPS URL with malformed percent encoding");
   rejectsInBoth((info) => {
     info.declaration.rules.url = "https://user:password@court.example/rules";
   }, "a URL containing credentials");
@@ -780,7 +790,7 @@ async function adapterContract(packet: X402DisputePacketV1): Promise<void> {
           return {
             verified: true,
             caseId: "pcase_test",
-            externalCaseId: packet.transactionId,
+            transactionId: packet.transactionId,
             awardHash: "f".repeat(64),
             manifestId: "aman_test",
             awardRevision: 1,
@@ -806,7 +816,7 @@ async function adapterContract(packet: X402DisputePacketV1): Promise<void> {
       return {
         verified: true as const,
         caseId: "pcase_test",
-        externalCaseId: "different-transaction",
+        transactionId: "different-transaction",
         awardHash: "f".repeat(64),
         manifestId: "aman_test",
         awardRevision: 1,

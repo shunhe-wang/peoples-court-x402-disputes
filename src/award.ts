@@ -45,7 +45,7 @@ export async function reportServedX402Award<
   if (!awardVerification.caseId.trim()) {
     verificationErrors.push("The verified Award is missing its People’s Court case identifier.");
   }
-  if (awardVerification.externalCaseId !== verified.value.transactionId) {
+  if (awardVerification.transactionId !== verified.value.transactionId) {
     verificationErrors.push(
       "The verified Award external transaction does not match the x402 packet.",
     );

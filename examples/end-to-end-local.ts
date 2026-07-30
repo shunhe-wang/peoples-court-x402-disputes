@@ -114,7 +114,7 @@ export async function runLocalArtifactToAwardExample(
         return {
           verified: true,
           caseId: confirmed.caseId,
-          externalCaseId: confirmed.externalCaseId,
+          transactionId: packet.transactionId,
           awardHash: "e".repeat(64),
           manifestId: "aman_local_example",
           awardRevision: 1,

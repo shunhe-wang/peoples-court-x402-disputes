@@ -17,13 +17,14 @@ The cases focus on wire behavior rather than People's Court's private applicatio
 - affirmative, transaction-bound acceptance;
 - resource-replay and requirement-tampering refusal;
 - refusal when acceptance proof material is missing;
-- JSON Schema and runtime-validator parity for signature material, canonical
-  amounts, networks, URLs, timestamps, and identifiers;
 - packet integrity and canonical-size limits;
 - signed-artifact and settlement cross-binding;
 - explicit execution ownership; and
-- verified served-Award binding before an execution-owner callback; and
 - separation between ordinary x402 and the x402r rail.
+
+The general contract suite in `test/index.test.ts` separately covers guarded
+JSON Schema/runtime behavior and verified served-Award binding. Those checks
+are not represented as entries in the versioned conformance manifest.
 
 This manifest is a human-readable implementation index, not a portable fixture set, cross-vendor certification, or independent standard. A future vendor-neutral suite would need complete versioned inputs, canonical outputs, and expected diagnostics that another implementation can consume without this package.
 
