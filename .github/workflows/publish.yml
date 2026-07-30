@@ -1,4 +1,4 @@
-name: Publish npm package
+name: Stage npm package
 
 on:
   workflow_dispatch:
@@ -17,8 +17,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  publish:
-    name: Verify and publish
+  stage:
+    name: Verify and stage
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: npm-release
@@ -64,9 +64,5 @@ jobs:
           fi
       - name: Inspect the npm tarball
         run: npm pack --dry-run
-      - name: Publish with provenance
-        run: npm publish --access public --provenance
-        env:
-          # Set this only for the one-time bootstrap publication. Delete it
-          # after configuring npm trusted publishing for this workflow.
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Stage with provenance
+        run: npm stage publish --access public --provenance
