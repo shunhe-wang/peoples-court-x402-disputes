@@ -16,6 +16,7 @@ testnet transaction, outreach, or upstream submission.
 - `scripts/test-package.mjs`
 - `scripts/verify-base-sepolia-evidence.mjs`
 - `.github/workflows/ci.yml`
+- `.github/dependabot.yml`
 - `.gitignore`
 - `CONTRIBUTING.md`
 - `package.json`

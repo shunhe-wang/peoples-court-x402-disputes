@@ -101,5 +101,10 @@ It is never triggered by case status alone.
 
 Do not open a public issue for a suspected vulnerability.
 
-Use [GitHub private vulnerability reporting](https://github.com/shunhe-wang/peoples-court-x402-disputes/security/advisories/new).
-No public security email is listed until a monitored mailbox is available.
+While the repository is private, collaborators should use
+[GitHub Security Advisories](https://github.com/shunhe-wang/peoples-court-x402-disputes/security/advisories/new)
+to report and discuss vulnerabilities privately.
+
+Enable GitHub private vulnerability reporting before changing the repository
+to public visibility. No public security email is listed until a monitored
+mailbox is available.
