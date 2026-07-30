@@ -228,21 +228,24 @@ and trust-policy ID. The helper cross-checks those bindings before it can call
 the reporting callback.
 
 ```ts
+const awardReportIdempotencyKey = crypto.randomUUID();
+
 const result = await reportServedX402Award(
   {
     packet,
     servedAward,
-    idempotencyKey: crypto.randomUUID(),
+    idempotencyKey: awardReportIdempotencyKey,
   },
   {
     executionMode: "partner_executes",
     executionOwner: "merchant-platform",
     verifyServedAward: async ({ servedAward }) =>
       awardVerifier.verifyServedPackage(servedAward),
-    reportServedAward: async ({ verification }) =>
+    reportServedAward: async ({ verification, idempotencyKey }) =>
       merchantPayments.reportAward({
         caseId: verification.caseId,
         awardHash: verification.awardHash,
+        idempotencyKey,
       }),
   },
 );
