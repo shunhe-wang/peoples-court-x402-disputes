@@ -68,12 +68,8 @@ Resource server hooks validate the acceptance before both verification and settl
 
 Applications that need cryptographic proof validation provide `verifyAcceptanceProof`.
 
-The general protocol supports `clickthrough`, `wallet_signature`,
-`agent_signature`, and `signed_document`.
-The bundled People’s Court hosted-adjudication adapter currently permits only
-`clickthrough` and `signed_document`.
-It rejects wallet and agent signatures before transport until the hosted
-provisioning flow retains and verifies their complete signing material.
+The general protocol supports `clickthrough`, `wallet_signature`, `agent_signature`, and `signed_document`.
+The v1 hosted People’s Court adapter permits `clickthrough` and `signed_document` and rejects other methods before transport.
 
 ## Canonicalization
 
@@ -100,8 +96,7 @@ EIP-712 artifacts are verified locally every time packet integrity is checked.
 
 JWS artifacts are locally verified only when the caller supplies a trusted verifier on both construction and every later integrity check.
 
-The current Partner API service does not have a trusted JWS identity-verification policy.
-It therefore rejects packets that claim a JWS artifact is verified; use EIP-712 for reproducibly verified Partner API artifacts.
+The v1 hosted Partner API accepts EIP-712 as verified and JWS only as `present_unverified`.
 
 Verification checks the artifact signature and its resource, payment, payer, network, transaction, and timing bindings as applicable.
 
@@ -189,7 +184,7 @@ When present, the server:
 3. matches transaction, parties, amount, provider, Rules, terms, scope, acceptance method, and acceptance artifact to stored records;
 4. includes the packet in the prepared filing digest;
 5. requires a second exact confirmation;
-6. stores the canonical packet as case evidence and retains its original bytes; and
+6. stores the canonical packet as case evidence; and
 7. returns the packet hash on case reads.
 
 The existing policy, authority grant, claimant consent, and respondent consent remain mandatory.
@@ -207,24 +202,3 @@ An acceptance artifact is evidence of the recorded acceptance act.
 None of these artifacts is a merits finding, proof of satisfactory performance, proof of delegated authority, proof of notice, or a guarantee that an award can be executed.
 
 The adjudicator determines weight and merits under the applicable Rules.
-
-## Reference implementation crosswalk
-
-The package deliberately preserves several safety patterns confirmed in
-external arbiter integrations:
-
-- Kleros-style internal and external identifiers remain distinct so a local
-  case can be correlated with the payment or execution system.
-- The packet and private intake bind immutable payment information by hash
-  before any later reporting or execution step.
-- Evidence is content-addressed, while the private proceeding may accept later
-  evidence without rewriting the original transaction packet.
-- Decision, service, and execution remain separate states, so an execution
-  failure cannot erase or reverse a served Award.
-- Event-driven x402r intake remains on the separate x402r path with replay and
-  operator checks.
-
-The package does not adopt first-evidence-only adjudication, fresh random model
-seeds, or direct decide-and-execute flows used by narrower experimental
-arbiters. Those patterns are not suitable for this Rules-bound bilateral
-dispute process.

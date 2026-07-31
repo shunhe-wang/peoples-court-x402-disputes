@@ -2,9 +2,10 @@
 
 ## Current status
 
-This source repository and SDK package are public. The SDK is not a deployed
-service.
+This source repository and SDK package are public.
+The SDK is a client library, not a deployed service or custody product.
 
+Its integrity and integration tests are public and reproducible.
 It has not received a professional external security audit or jurisdiction-specific legal review.
 
 Do not use the current package to claim automatic refunds, custody, escrow protection, or production-money readiness.
@@ -69,7 +70,7 @@ Ordinary x402 awards can be reported to the merchant or platform that actually c
 
 x402r remains on the existing x402r execution path.
 
-The separate bilateral security contract remains on its own audited funding and settlement path.
+The separate bilateral security contract remains on its own funding and settlement path.
 
 Unknown or pending execution outcomes must be reconciled before retry.
 
@@ -83,18 +84,11 @@ packet, and rejects an adapter whose execution mode or exact declared owner
 identity does not match.
 It is never triggered by case status alone.
 
-## Operational requirements before production use
+## Deployment responsibilities
 
-- Publish releases with protected provenance.
-- Add supported-version and vulnerability-reporting policies.
-- Pin exact compatible x402 versions and test upgrades before release.
-- Run clean-install, type, unit, integration, and production build checks in CI.
-- Obtain external protocol and security review.
-- Review arbitration, consumer, privacy, data-processing, sanctions, custody, and money-transmission implications for target uses.
-- Validate a real testnet x402 interaction without representing testnet results as mainnet readiness.
-- Establish signing-key authorization, rotation, revocation, and incident response.
-- Establish Partner API tenant onboarding, quotas, monitoring, support, and credential rotation.
-- Submit any x402 documentation listing only after the repository, package, and documentation URLs are stable.
+Production integrators must pin supported x402 versions, verify every acceptance and signed artifact under an explicit trust policy, protect credentials and signing keys, minimize retained data, monitor execution, and test upgrades before release.
+
+Obtain appropriate independent security and legal review for the intended jurisdiction and funds flow.
 
 ## Reporting a vulnerability
 

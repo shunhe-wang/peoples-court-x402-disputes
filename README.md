@@ -8,9 +8,8 @@ The package does not replace x402, act as a facilitator, reverse a payment, hold
 
 Status: public Apache-2.0 SDK. Version `0.1.0` is the initial npm release.
 
-This repository is the standalone integration SDK. The monorepo copy remains
-marked private. Package publication does not deploy the hosted service or
-authorize an external listing.
+This repository contains the public integration SDK.
+The separately operated People’s Court service is not included.
 
 The local compatibility matrix covers Node 20 and 22 with `@x402/core` and `@x402/extensions` `2.19.x` and `2.20.x`.
 
@@ -38,8 +37,8 @@ It composes with the official `offer-receipt` extension.
 
 EIP-712 offer and receipt signatures are verified locally.
 
-JWS artifacts remain `present_unverified` unless the caller supplies the same trusted verifier during construction and every later integrity check.
-The bundled Partner API adapter’s server currently accepts EIP-712 as its reproducibly verified format and rejects packets that claim verified JWS artifacts.
+JWS artifacts remain `present_unverified` unless the caller supplies a trusted verifier at every integrity check.
+The Partner API integration for SDK v0.1.0 accepts EIP-712 as its verified signed-artifact format and JWS only as `present_unverified`.
 
 ## Seller declaration
 
@@ -84,7 +83,7 @@ const declaration: PeopleCourtDisputeDeclarationV1 = {
     automatic: false,
   },
   resourceBinding: "exact_url",
-  privacyNoticeUrl: "https://peoplescourt.ai/privacy",
+  privacyNoticeUrl: "https://peoplescourt.ai/legal/privacy",
 };
 
 const routeExtensions = {
@@ -140,14 +139,10 @@ x402Client.registerExtension(clientExtension);
 
 The package does not treat payment alone as acceptance.
 
-For a wallet, agent, or document signature, the caller returns the matching
-method and signature metadata and should provide a server-side verifier.
+For a wallet, agent, or document signature, the caller returns the matching method and signature metadata and provides the appropriate verifier.
 
-The general wire protocol supports all four acceptance methods. The bundled
-People’s Court hosted-adjudication adapter currently accepts only
-`clickthrough` and `signed_document`, because the hosted service does not yet
-retain and verify the complete wallet or agent signature material. Unsupported
-methods fail before the transport is called.
+The wire protocol supports `clickthrough`, `wallet_signature`, `agent_signature`, and `signed_document`.
+The v1 hosted People’s Court adapter accepts `clickthrough` and `signed_document`; unsupported methods fail before transport.
 
 ## Build a packet
 
@@ -287,13 +282,7 @@ size, and canonical hashing.
 ```text
 npm ci
 npm run check
-```
-
-From the repository root:
-
-```text
-npm run test:x402-disputes
-npx tsc --noEmit
+npm pack --dry-run
 ```
 
 Read:
