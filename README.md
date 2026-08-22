@@ -6,7 +6,7 @@ It lets a resource server advertise bounded dispute terms, requires the payer to
 
 The package does not replace x402, act as a facilitator, reverse a payment, hold funds, or create a case from an API key alone.
 
-Status: public Apache-2.0 SDK. Version `0.1.0` is the initial npm release.
+Status: public Apache-2.0 SDK. Package version `0.1.1` is the Rules-discovery documentation patch.
 
 This repository is the standalone integration SDK. The monorepo copy remains
 marked private. Package publication does not deploy the hosted service or
@@ -50,19 +50,34 @@ import {
   type PeopleCourtDisputeDeclarationV1,
 } from "@peoples-court/x402-disputes";
 
+const currentRulesResponse = await fetch(
+  "https://peoplescourt.ai/api/v2/rules/current",
+);
+if (!currentRulesResponse.ok) {
+  throw new Error(`Rules discovery failed: ${currentRulesResponse.status}`);
+}
+const { data: currentRules } = await currentRulesResponse.json() as {
+  data: {
+    rulesetId: string;
+    rulesVersion: string;
+    rulesHash: string;
+    apiCompatibilityVersion: string;
+  };
+};
+
 const declaration: PeopleCourtDisputeDeclarationV1 = {
   version: 1,
   provider: {
     id: "peoples-court",
     name: "People's Court",
     forumUrl: "https://peoplescourt.ai",
-    apiVersion: "2026-07-23",
+    apiVersion: currentRules.apiCompatibilityVersion,
   },
   seller: { id: "merchant-principal-123", name: "Example Merchant" },
   rules: {
-    id: "arbitral-rules-v0.21",
-    version: "0.21",
-    hash: "<lowercase-sha256>",
+    id: currentRules.rulesetId,
+    version: currentRules.rulesVersion,
+    hash: currentRules.rulesHash,
     url: "https://peoplescourt.ai/rules",
   },
   terms: {
@@ -101,6 +116,9 @@ resourceServer.registerExtension(serverExtension);
 ```
 
 The server hooks fail closed when the echoed declaration, exact resource, selected payment requirement, terms, parties, or acceptance proof do not match.
+
+Discover the current Rules when configuring an application, then pin the returned `rulesetId`, `rulesVersion`, and `rulesHash` in the declaration shown for acceptance.
+Do not silently replace that tuple for an already accepted transaction when a later Rules version becomes current.
 
 ## Payer acceptance
 

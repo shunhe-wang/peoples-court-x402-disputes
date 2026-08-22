@@ -28,6 +28,36 @@ assert.match(
   "X402_COMPAT_VERSION must be an exact version",
 );
 
+function assertHostedRulesDiscovery(readme, source) {
+  const sellerDeclaration = readme.match(/## Seller declaration([\s\S]*?)## Payer acceptance/)?.[1] ?? "";
+  assert.match(sellerDeclaration, /\/api\/v2\/rules\/current/, `${source} discovers the current Rules tuple`);
+  for (const assignment of [
+    "id: currentRules.rulesetId",
+    "version: currentRules.rulesVersion",
+    "hash: currentRules.rulesHash",
+  ]) {
+    assert.match(sellerDeclaration, new RegExp(assignment.replaceAll(".", "\\.")), `${source} constructs the declaration from ${assignment}`);
+  }
+  assert.doesNotMatch(
+    sellerDeclaration,
+    /arbitral-rules-v\d+(?:\.\d+)*/,
+    `${source} does not hard-code a numbered hosted Rules identifier`,
+  );
+  assert.match(
+    sellerDeclaration,
+    /Do not silently replace that tuple for an already accepted transaction when a later Rules version becomes current\./,
+    `${source} preserves the accepted Rules tuple`,
+  );
+}
+
+const readme = readFileSync(path.join(packageRoot, "README.md"), "utf8");
+assertHostedRulesDiscovery(readme, "README");
+assert.match(
+  readme,
+  new RegExp("Package version `" + packageManifest.version.replaceAll(".", "\\.") + "`"),
+  "README labels the npm package version independently from the Rules version",
+);
+
 const scratch = mkdtempSync(
   path.join(tmpdir(), "peoples-court-x402-standalone-"),
 );
@@ -67,6 +97,9 @@ try {
   assert.equal(tarballs.length, 1, "expected exactly one package tarball");
   const tarball = tarballs[0];
   assert.ok(tarball);
+
+  const packedReadme = run("tar", ["-xOzf", tarball, "package/README.md"]).stdout;
+  assertHostedRulesDiscovery(packedReadme, "packed README");
 
   const entries = run("tar", ["-tzf", tarball]).stdout
     .trim()

@@ -1,6 +1,6 @@
 {
   "name": "@peoples-court/x402-disputes",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A consent-aware x402 dispute evidence and adjudication extension for People's Court.",
   "license": "Apache-2.0",
   "author": "Shunhe Wang",
