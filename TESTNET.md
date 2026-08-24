@@ -12,7 +12,7 @@ The verifier defaults to `https://base-sepolia-rpc.publicnode.com` because this 
 ## Completed evidence run
 
 The approved run used x402 2.20.0 and SDK version 0.1.0 at commit
-`a09781594e2aaf26bda1b73aad2c002cf4998251`.
+`1317c9c6d5844c9c29bcdab5aa02bdedf0c62f53`.
 
 - Transaction:
   [`0xd1aa7830aa1c87dccf04e85218a2feebc2b5e4b081eeafcf90ad9aa5b41a8819`](https://sepolia.basescan.org/tx/0xd1aa7830aa1c87dccf04e85218a2feebc2b5e4b081eeafcf90ad9aa5b41a8819)
