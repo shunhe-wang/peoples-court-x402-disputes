@@ -307,13 +307,6 @@ npm ci
 npm run check
 ```
 
-From the repository root:
-
-```text
-npm run test:x402-disputes
-npx tsc --noEmit
-```
-
 Read:
 
 - [PROTOCOL.md](PROTOCOL.md) for the wire contract;
