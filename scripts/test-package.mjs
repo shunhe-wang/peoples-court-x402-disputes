@@ -58,6 +58,34 @@ assert.match(
   "README labels the npm package version independently from the Rules version",
 );
 
+for (const markdownFile of packageManifest.files.filter((file) =>
+  file.endsWith(".md"),
+)) {
+  const markdown = readFileSync(path.join(packageRoot, markdownFile), "utf8");
+  for (const match of markdown.matchAll(/\bnpm\s+run\s+([a-zA-Z0-9:_-]+)/g)) {
+    const script = match[1];
+    assert.ok(
+      Object.hasOwn(packageManifest.scripts, script),
+      `${markdownFile} references missing package script: npm run ${script}`,
+    );
+  }
+}
+
+const protocol = readFileSync(path.join(packageRoot, "PROTOCOL.md"), "utf8");
+const protocolPackageVersions = [
+  ...protocol.matchAll(/^- Package version: `([^`]+)`$/gm),
+];
+assert.equal(
+  protocolPackageVersions.length,
+  1,
+  "PROTOCOL.md must declare exactly one package version",
+);
+assert.equal(
+  protocolPackageVersions[0]?.[1],
+  packageManifest.version,
+  "PROTOCOL.md package version must match package.json",
+);
+
 const scratch = mkdtempSync(
   path.join(tmpdir(), "peoples-court-x402-standalone-"),
 );

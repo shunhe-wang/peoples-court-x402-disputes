@@ -15,7 +15,7 @@ It does not decide a dispute or execute an award.
 - Packet version: `1`
 - Supported x402 version: `2`
 - Tested x402 package lines: `2.19.x` and `2.20.x`
-- Package version: `0.1.0`
+- Package version: `0.1.1`
 
 Unknown fields fail validation.
 
