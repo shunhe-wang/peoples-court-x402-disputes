@@ -62,7 +62,7 @@
   },
   "devDependencies": {
     "@x402/core": "2.20.0",
-    "@x402/extensions": "2.20.0",
+    "@x402/extensions": "2.23.0",
     "ajv": "8.18.0",
     "ajv-formats": "3.0.1",
     "tsx": "^4.22.4",
