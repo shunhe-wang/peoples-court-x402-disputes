@@ -61,7 +61,7 @@
     "@x402/extensions": "~2.19.0 || ~2.20.0"
   },
   "devDependencies": {
-    "@x402/core": "2.20.0",
+    "@x402/core": "2.24.0",
     "@x402/extensions": "2.23.0",
     "ajv": "8.18.0",
     "ajv-formats": "3.0.1",
