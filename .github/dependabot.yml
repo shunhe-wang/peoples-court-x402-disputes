@@ -4,9 +4,32 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
+    # Review one coherent dependency batch rather than spend a CI matrix per bump.
+    open-pull-requests-limit: 1
+    cooldown:
+      default-days: 7
+    groups:
+      compatible-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - patch
+          - minor
+      major-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - major
+      security-dependencies:
+        applies-to: security-updates
+        patterns:
+          - "*"
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 1
+    groups:
+      workflow-actions:
+        patterns:
+          - "*"

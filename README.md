@@ -12,7 +12,8 @@ This repository is the standalone integration SDK. The monorepo copy remains
 marked private. Package publication does not deploy the hosted service or
 authorize an external listing.
 
-The local compatibility matrix covers Node 20 and 22 with `@x402/core` and `@x402/extensions` `2.19.x` and `2.20.x`.
+The CI compatibility matrix covers Node 20 and 22 with `@x402/core` and `@x402/extensions` `2.19.x` and `2.20.x`.
+The development pair and release validation also cover `2.25.x`.
 
 ## Protocol position
 
