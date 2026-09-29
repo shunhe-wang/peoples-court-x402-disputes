@@ -14,6 +14,7 @@ import {
   canonicalSha256,
   packetHashPayload,
 } from "./canonical.js";
+import { sameSettlementIdentifier } from "./identifiers.js";
 import {
   extractPeopleCourtDisputeExtension,
   verifyAcceptanceBindings,
@@ -297,8 +298,11 @@ export async function verifyX402DisputePacketIntegrity(
     (packet.receipt.payload.resourceUrl !== packet.resourceUrl ||
       packet.receipt.payload.network !== packet.payment.network ||
       (packet.receipt.payload.transaction &&
-        packet.receipt.payload.transaction.toLowerCase() !==
-          packet.settlement.transaction.toLowerCase()))
+        !sameSettlementIdentifier(
+          packet.payment.network,
+          packet.receipt.payload.transaction,
+          packet.settlement.transaction,
+        )))
   ) {
     errors.push("packet receipt payload does not match the settlement");
   }

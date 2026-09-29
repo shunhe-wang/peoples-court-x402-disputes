@@ -14,6 +14,10 @@ Do not use the current package to claim automatic refunds, custody, escrow prote
 The validators reject unknown fields, malformed identifiers, non-canonical timestamps, unsafe URLs, oversized packets, unsupported claims, unsupported execution modes, invalid hashes, and cross-transaction artifact mismatches.
 
 Resource server hooks abort verification and settlement when the required acceptance is missing or does not match the exact declaration, resource, and selected payment requirement.
+The expected resource URL must come from explicit server `resourceUrl` configuration, not the client payload.
+A resolver may select a configured URL using transport context, but request-derived URLs and headers are not trusted configuration.
+Missing configuration aborts, including for the exported unconfigured singleton.
+Thrown validation/proof/resolver exceptions are converted to generic explicit aborts because x402 may otherwise continue after a thrown hook error.
 
 Partner API intake independently revalidates persisted packets at prepare and confirm time.
 
@@ -40,6 +44,7 @@ The package validates acceptance structure and transaction bindings.
 Cryptographic or durable clickthrough verification is application-specific.
 
 Production resource servers should provide `verifyAcceptanceProof`.
+It must return exactly `true`; false, non-boolean values, and exceptions abort both verification and settlement.
 
 The People’s Court Partner API also requires the acceptance artifact to match a separately registered claimant consent record.
 

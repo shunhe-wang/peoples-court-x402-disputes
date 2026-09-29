@@ -53,6 +53,12 @@ export interface CreatePeopleCourtDisputeClientExtensionOptions {
 }
 
 export interface CreatePeopleCourtDisputeResourceServerExtensionOptions {
+  /** Server-owned advertised URL, or a resolver using only transport context.
+   * Missing configuration rejects acceptance. Never trust the payment's URL.
+   */
+  resourceUrl?: string | (
+    (transportContext: unknown) => string | Promise<string>
+  );
   verifyAcceptanceProof?: (
     acceptance: PeopleCourtDisputeAcceptanceV1,
   ) => Promise<boolean>;
