@@ -220,6 +220,7 @@ async function extensionContract(): Promise<void> {
   assert.equal(bound.valid, true);
 
   const server = createPeopleCourtDisputeResourceServerExtension({
+    resourceUrl: RESOURCE_URL,
     now: () => NOW,
   });
   const hookResult = await server.hooks?.onBeforeVerify?.(

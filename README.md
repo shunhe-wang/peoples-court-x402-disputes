@@ -109,6 +109,7 @@ const routeExtensions = {
 
 const serverExtension =
   createPeopleCourtDisputeResourceServerExtension({
+    resourceUrl: "https://merchant.example/api/report",
     verifyAcceptanceProof: async (acceptance) =>
       merchantAcceptanceStore.verify(acceptance),
   });
@@ -117,6 +118,15 @@ resourceServer.registerExtension(serverExtension);
 ```
 
 The server hooks fail closed when the echoed declaration, exact resource, selected payment requirement, terms, parties, or acceptance proof do not match.
+Configure `resourceUrl` to the same server-owned advertised URL used by the route.
+For multiple resources, it may be an async `(transportContext: unknown) => string` resolver mapping a matched route to a server-configured URL.
+The resolver receives only x402’s transport context, never the client payment payload.
+Request-derived hosts, headers, and URL fields remain untrusted; do not use them as authoritative resource configuration.
+The payment’s echoed URL and the acceptance must both match the resolved URL before verification and again before settlement.
+
+Compatibility note: missing or unusable `resourceUrl` configuration now aborts acceptance.
+Use the configured factory above; the exported unconfigured `peopleCourtDisputeResourceServerExtension` singleton aborts until replaced with a configured instance.
+Thrown resolver, clock, or proof-verifier errors produce a generic explicit abort, and a configured proof verifier must return exactly `true`.
 
 Discover the current Rules when configuring an application, then pin the returned `rulesetId`, `rulesVersion`, and `rulesHash` in the declaration shown for acceptance.
 Do not silently replace that tuple for an already accepted transaction when a later Rules version becomes current.

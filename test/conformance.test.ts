@@ -373,6 +373,7 @@ const cases: Record<string, () => Promise<CaseOutcome>> = {
     };
     delete extension.info.acceptance.proof;
     const server = createPeopleCourtDisputeResourceServerExtension({
+      resourceUrl: RESOURCE_URL,
       now: () => NOW,
     });
     const result = await server.hooks?.onBeforeVerify?.(
