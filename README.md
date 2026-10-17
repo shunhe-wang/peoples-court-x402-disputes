@@ -6,7 +6,7 @@ It lets a resource server advertise bounded dispute terms, requires the payer to
 
 The package does not replace x402, act as a facilitator, reverse a payment, hold funds, or create a case from an API key alone.
 
-Status: public Apache-2.0 SDK. Package version `0.1.1` is the Rules-discovery documentation patch.
+Status: public Apache-2.0 SDK. Package version `0.2.0` files against the canonical People’s Court API (`POST /api/filings`) and replaces the retired v2 filing shape.
 
 This repository is the standalone integration SDK. The monorepo copy remains
 marked private. Package publication does not deploy the hosted service or
@@ -40,7 +40,7 @@ It composes with the official `offer-receipt` extension.
 EIP-712 offer and receipt signatures are verified locally.
 
 JWS artifacts remain `present_unverified` unless the caller supplies the same trusted verifier during construction and every later integrity check.
-The bundled Partner API adapter’s server currently accepts EIP-712 as its reproducibly verified format and rejects packets that claim verified JWS artifacts.
+The hosted filing adapter refuses packets that claim a verified JWS artifact, because the hosted service has no trusted JWS identity policy; use EIP-712 for artifacts anyone can reverify.
 
 ## Seller declaration
 
@@ -52,7 +52,7 @@ import {
 } from "@peoples-court/x402-disputes";
 
 const currentRulesResponse = await fetch(
-  "https://peoplescourt.ai/api/v2/rules/current",
+  "https://peoplescourt.ai/api/rules/current",
 );
 if (!currentRulesResponse.ok) {
   throw new Error(`Rules discovery failed: ${currentRulesResponse.status}`);
@@ -202,41 +202,93 @@ Signed offer and receipt artifacts are preserved when supplied.
 
 The packet is capped at 128 KiB and rejects unknown fields.
 
-## Prepare adjudication
+## File with People’s Court
+
+A hosted filing needs, before any request:
+
+- a partner credential with filing authority;
+- a registered dispute policy;
+- an authority grant for the claimant principal and transaction that allows `file_dispute`, and `submit_evidence` if the integration files the packet exhibit;
+- a registered claimant consent record for the same transaction, parties, current Rules, and procedure terms (claims below USD 100 are assigned the `ai_fast` procedure before consent, so the consent record must carry those terms); and
+- the buyer’s People’s Court account, which accepts the exact filing packet.
 
 ```ts
 import {
   createPeopleCourtAdjudicationAdapter,
+  createPeopleCourtHttpTransport,
 } from "@peoples-court/x402-disputes";
 
-const adjudication = createPeopleCourtAdjudicationAdapter(partnerTransport);
+const adjudication = createPeopleCourtAdjudicationAdapter(
+  createPeopleCourtHttpTransport({
+    baseUrl: "https://peoplescourt.ai",
+    apiKey: process.env.PEOPLES_COURT_API_KEY!,
+  }),
+);
 
+// 1. Prepare. The adapter verifies the packet, derives transactionId and the
+//    claim amount from it, and binds the packet hash in the filing metadata.
 const prepared = await adjudication.prepare({
   packet,
-  idempotencyKey: crypto.randomUUID(),
+  idempotencyKey: `prepare-${packet.packetHash}`,
   externalCaseId: packet.transactionId,
   policyVersion: "merchant-policy-v1",
   authorityGrantId: "authority-grant-id",
-  consentArtifactIds: {
-    claimant: "claimant-consent-id",
-    respondent: "respondent-consent-id",
-  },
+  consentArtifactIds: { claimant: "claimant-consent-id" },
+  claimantAcceptanceIdentity: { email: "buyer@example.com" },
+  intakeMode: "claimant_initiated",
+  confirmationPolicy: { mode: "initiator_only" },
   summary: "The purchased response did not satisfy the declared specification.",
-  amount: { value: 25, currency: "USD" },
   parties: {
-    claimant: { externalId: "buyer-principal-456", name: "Buyer" },
-    respondent: { externalId: "merchant-principal-123", name: "Merchant" },
+    claimant: {
+      externalId: "buyer-principal-456",
+      name: "Buyer",
+      principalKind: "individual",
+    },
+    respondent: {
+      externalId: "merchant-principal-123",
+      name: "Merchant",
+      principalKind: "organization",
+    },
   },
   claim: {
     statement: "The delivered result omitted the purchased data.",
     requestedOutcome: "refund",
   },
 });
+
+// 2. Send prepared.hostedAcceptanceUrl to the buyer. It is shown once.
+//    After the buyer accepts, confirm the exact draft to open the case.
+const opened = await adjudication.confirm(prepared.draftId, {
+  confirmationReference: `x402:${packet.transactionId}`,
+  idempotencyKey: `confirm-${prepared.draftId}`,
+});
+
+// 3. When the case reaches the evidence stage, file the packet as an exhibit.
+await adjudication.submitPacketEvidence(
+  opened.caseId!,
+  { packet },
+  `exhibit-${opened.caseId}-${packet.packetHash}`,
+);
 ```
 
-The adapter verifies packet integrity and exact party and amount bindings before calling the transport.
+[`examples/hosted-filing.ts`](examples/hosted-filing.ts) is the same flow as a runnable module.
 
-The Partner API then independently checks registered authority, both parties’ consent records, policy, terms, current Rules, the prepared digest, and exact confirmation.
+What the adapter does:
+
+- verifies packet integrity and refuses x402r packets, unsupported acceptance methods, verified-JWS labels, mismatched parties, and amounts that are not whole USD cents;
+- sends `transactionId` and `claimAmount` taken from the packet, so they cannot drift from it;
+- adds `x402.transactionId`, `x402.packetHash`, and `x402.packetVersion` to the filing metadata and refuses caller metadata under `x402.`;
+- confirms with the exact participant ID and confirmation statement the API returns for the draft; and
+- files the packet’s canonical JSON as `x402-dispute-packet-<hash>.json`, with a brief that states the hash and that the claimant’s software, not People’s Court, checked it.
+
+What People’s Court checks: the partner credential, policy, authority grant, claimant consent record, the buyer’s hosted acceptance, the prepared draft digest (which covers the metadata), and the exact confirmation.
+It also enforces the procedure’s stages, so the exhibit is refused until the evidence stage opens.
+
+What People’s Court does not check: the hosted service does not parse or verify the packet.
+It stores the packet hash with the case and the exhibit bytes as claimant evidence.
+The respondent can challenge the exhibit’s authenticity through the ordinary evidence process.
+
+Failed requests throw `PeopleCourtApiError` with the HTTP status, problem `code`, and `requestId`.
 
 After retrieving the existing signed served-award package, call
 `reportServedX402Award` with an adapter whose mode and exact owner identity
@@ -279,13 +331,13 @@ runs automatically and refuses a mismatched execution owner.
 
 | Transaction rail | Packet mode | Filing path | Who controls funds |
 | --- | --- | --- | --- |
-| Ordinary x402 | `partner_executes` | Partner API adapter | The actual merchant or platform |
+| Ordinary x402 | `partner_executes` | Hosted filing adapter (`POST /api/filings`) | The actual merchant or platform |
 | x402r | `x402r` | Existing x402r referral path | x402r |
 | Bilateral security contract | Not supported in packet v1 | Existing bilateral case flow | The separate bilateral contract |
 
 An ordinary x402 payment is not converted into a refundable payment.
 
-An x402r payment stays x402r and is not rerouted through the Partner API adapter.
+An x402r payment stays x402r and is not rerouted through the hosted filing adapter.
 
 The v1 declaration permits only `partner_executes` and `x402r`.
 A standard x402 payment does not prove a separate bilateral contract was funded, and the initial ordinary-x402 workflow requires a named partner execution owner.

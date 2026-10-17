@@ -9,22 +9,43 @@ import {
 export async function runLocalArtifactToAwardExample(
   packet: X402DisputePacketV1,
 ) {
+  const draft = {
+    draftId: "pfd_local_example",
+    reservedCaseId: "pcase_local_example",
+    externalCaseId: packet.transactionId,
+    status: "awaiting_confirmations",
+    draftDigest: "d".repeat(64),
+    expiresAt: "2026-07-29T12:30:00.000Z",
+    rules: {
+      version: packet.declaration.rules.version,
+      hash: packet.declaration.rules.hash,
+    },
+    fee: {},
+    participants: [
+      {
+        participantId: "pcase_local_example:claimant",
+        side: "claimant" as const,
+        principalId: packet.parties.claimantId,
+        agentId: "local-agent",
+      },
+    ],
+    confirmations: [
+      {
+        participantId: "pcase_local_example:claimant",
+        side: "claimant" as const,
+        required: true,
+        status: "pending",
+        confirmationStatement: "Confirm the exact local example filing.",
+      },
+    ],
+    hostedAcceptanceUrl: "https://court.example/accept/filing/pfd_local_example#token=local",
+  };
   const transport: PeopleCourtPartnerTransport = {
     async prepareFiling() {
-      return {
-        data: {
-          draftId: "pfd_local_example",
-          reservedCaseId: "pcase_local_example",
-          draftDigest: "d".repeat(64),
-          confirmationStatement: "Confirm the exact local example filing.",
-          expiresAt: "2026-07-29T12:30:00.000Z",
-          rules: {
-            version: packet.declaration.rules.version,
-            hash: packet.declaration.rules.hash,
-          },
-          fee: {},
-        },
-      };
+      return { data: draft };
+    },
+    async getFiling() {
+      return { data: draft };
     },
     async confirmFiling() {
       return {
@@ -32,15 +53,16 @@ export async function runLocalArtifactToAwardExample(
           caseId: "pcase_local_example",
           externalCaseId: packet.transactionId,
           status: "awaiting_party_response",
-          accessSide: "claimant",
-          rulesVersion: packet.declaration.rules.version,
-          rulesHash: packet.declaration.rules.hash,
+          rules: {
+            version: packet.declaration.rules.version,
+            hash: packet.declaration.rules.hash,
+          },
           createdAt: "2026-07-29T12:00:00.000Z",
         },
       };
     },
     async submitEvidence() {
-      return { accepted: true };
+      return { data: { accepted: true } };
     },
     async getCase(caseId) {
       return { data: { caseId, status: "decided" } };
@@ -62,23 +84,21 @@ export async function runLocalArtifactToAwardExample(
     externalCaseId: packet.transactionId,
     policyVersion: "local-policy-v1",
     authorityGrantId: "local-authority",
-    consentArtifactIds: {
-      claimant: "local-claimant-consent",
-      respondent: "local-respondent-consent",
-    },
+    consentArtifactIds: { claimant: "local-claimant-consent" },
+    claimantAcceptanceIdentity: { email: "buyer@example.test" },
+    intakeMode: "claimant_initiated",
+    confirmationPolicy: { mode: "initiator_only" },
     summary: "Test-only local x402 dispute.",
-    amount: {
-      value: Number(packet.disputedAmount.value),
-      currency: "USD",
-    },
     parties: {
       claimant: {
         externalId: packet.parties.claimantId,
         name: "Local Buyer",
+        principalKind: "individual",
       },
       respondent: {
         externalId: packet.parties.respondentId,
         name: "Local Seller",
+        principalKind: "organization",
       },
     },
     claim: {
@@ -87,20 +107,17 @@ export async function runLocalArtifactToAwardExample(
     },
   });
   const confirmed = await adjudication.confirm(prepared.draftId, {
-    draftDigest: prepared.draftDigest,
-    confirmationStatement: prepared.confirmationStatement,
-    actorId: "local-agent",
-    principalId: packet.parties.claimantId,
-    confirmationMethod: "protocol_act",
     confirmationReference: "local://confirmation/example",
     idempotencyKey: "local-confirm-example",
   });
-  await adjudication.submitEvidence(
-    confirmed.caseId,
-    { brief: "Additional test-only evidence." },
+  if (!confirmed.caseId) throw new Error("The local example case did not open.");
+  const caseId = confirmed.caseId;
+  await adjudication.submitPacketEvidence(
+    caseId,
+    { packet },
     "local-evidence-example",
   );
-  const servedAward = await adjudication.getServedAward(confirmed.caseId);
+  const servedAward = await adjudication.getServedAward(caseId);
   const reported = await reportServedX402Award(
     {
       packet,
@@ -113,7 +130,7 @@ export async function runLocalArtifactToAwardExample(
       async verifyServedAward() {
         return {
           verified: true,
-          caseId: confirmed.caseId,
+          caseId,
           transactionId: packet.transactionId,
           awardHash: "e".repeat(64),
           manifestId: "aman_local_example",
