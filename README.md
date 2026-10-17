@@ -226,7 +226,7 @@ const adjudication = createPeopleCourtAdjudicationAdapter(
 );
 
 // 1. Prepare. The adapter verifies the packet, derives transactionId and the
-//    claim amount from it, and binds the packet hash in the filing metadata.
+//    claim amount from it, and records the packet hash in the filing metadata.
 const prepared = await adjudication.prepare({
   packet,
   idempotencyKey: `prepare-${packet.packetHash}`,
@@ -267,7 +267,7 @@ const opened = await adjudication.confirm(prepared.draftId, {
 await adjudication.submitPacketEvidence(
   opened.caseId!,
   { packet },
-  `exhibit-${opened.caseId}-${packet.packetHash}`,
+  `exhibit-${packet.packetHash}`,
 );
 ```
 
@@ -279,10 +279,19 @@ What the adapter does:
 - sends `transactionId` and `claimAmount` taken from the packet, so they cannot drift from it;
 - adds `x402.transactionId`, `x402.packetHash`, and `x402.packetVersion` to the filing metadata and refuses caller metadata under `x402.`;
 - confirms with the exact participant ID and confirmation statement the API returns for the draft; and
-- files the packet’s canonical JSON as `x402-dispute-packet-<hash>.json`, with a brief that states the hash and that the claimant’s software, not People’s Court, checked it.
+- files the packet’s canonical JSON as the plain-text exhibit `x402-dispute-packet-<hash>.txt` (deployments with durable evidence capture accept only UTF-8 `.txt` attachments), with a brief that states the hash and that the claimant’s software, not People’s Court, checked it.
 
-What People’s Court checks: the partner credential, policy, authority grant, claimant consent record, the buyer’s hosted acceptance, the prepared draft digest (which covers the metadata), and the exact confirmation.
-It also enforces the procedure’s stages, so the exhibit is refused until the evidence stage opens.
+What People’s Court checks: the partner credential, policy, authority grant, claimant consent record, the buyer’s hosted acceptance, the prepared draft digest, and the exact confirmation.
+The packet hash is committed in the partner-side draft digest; it is not shown to the buyer in the acceptance packet, and filing reads do not return it.
+The forum also enforces the procedure’s stages, so the exhibit is refused until the evidence stage opens.
+
+A fast case (claims below USD 100) limits each party to 16,000 characters of text and two text exhibits (Rule 4.12).
+The packet exhibit uses one of the two and counts toward the character limit, so keep packets small and leave room for the claimant’s other filings.
+
+Retries: reuse the same idempotency key and unchanged body to recover a result.
+A replayed preparation does not return `hostedAcceptanceUrl` again; keep the first response.
+If the buyer has not accepted, `confirm` fails with `acceptance_required`, and the error’s `problem.details.hostedAcceptanceUrl` carries a fresh link.
+A prepared draft expires; prepare a new one, with a new key, after expiry.
 
 What People’s Court does not check: the hosted service does not parse or verify the packet.
 It stores the packet hash with the case and the exhibit bytes as claimant evidence.

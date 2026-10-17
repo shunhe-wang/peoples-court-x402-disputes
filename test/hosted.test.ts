@@ -10,6 +10,7 @@ import type {
 
 import {
   PeopleCourtApiError,
+  usdDecimalToMinorUnits,
   buildX402DisputePacket,
   canonicalSha256,
   createPeopleCourtAdjudicationAdapter,
@@ -261,7 +262,8 @@ const packet = await packetFixture();
   for (const key of fields) assert.ok(submissionShape.properties.includes(key));
   assert.equal(form.get("party"), "claimant");
   const file = form.get("files") as File;
-  assert.equal(file.type, "application/json");
+  assert.equal(file.type, "text/plain");
+  assert.match(file.name, /\.txt$/, "durable-capture deployments accept only .txt text/plain attachments");
   const filed = JSON.parse(await file.text()) as X402DisputePacketV1;
   assert.equal(await canonicalSha256(packetHashPayload(filed)), packet.packetHash);
 }
@@ -282,7 +284,7 @@ const packet = await packetFixture();
     () =>
       adjudication.prepare({
         packet,
-        idempotencyKey: "k1",
+        idempotencyKey: "prepare-key-0001",
         externalCaseId: TRANSACTION_ID,
         policyVersion: "policy-v1",
         authorityGrantId: "agr_1",
@@ -323,7 +325,7 @@ const packet = await packetFixture();
     () =>
       adjudication.prepare({
         packet: jwsPacket,
-        idempotencyKey: "k-jws",
+        idempotencyKey: "prepare-key-jws1",
         externalCaseId: TRANSACTION_ID,
         policyVersion: "policy-v1",
         authorityGrantId: "agr_1",
@@ -341,6 +343,78 @@ const packet = await packetFixture();
     /verified JWS signature/,
   );
   assert.equal(server.requests.length, 0, "a refused packet never reaches the API");
+}
+
+// Confirmation picks the one pending claimant requirement and its own participant row.
+{
+  const server = fakeServer(packet);
+  const twoClaimants = async (input: Parameters<typeof fetch>[0], init?: RequestInit) => {
+    const response = await server.fetchImpl(input, init);
+    if ((init?.method ?? "GET") !== "GET") return response;
+    const body = await response.json() as { data: Record<string, any> };
+    body.data.participants.unshift({ participantId: "pcase_1:claimant:2", side: "claimant", principalId: "other", agentId: "other-agent" });
+    body.data.confirmations.unshift({ participantId: "pcase_1:claimant:2", side: "claimant", required: true, status: "pending", confirmationStatement: "Other." });
+    return new Response(JSON.stringify(body), { status: 200 });
+  };
+  const adjudication = createPeopleCourtAdjudicationAdapter(createPeopleCourtHttpTransport({ baseUrl: BASE, apiKey: "pc_test_key", fetch: twoClaimants }));
+  await assert.rejects(() => adjudication.confirm("pfd_1", { confirmationReference: "x402:ref", idempotencyKey: "confirm-key-0001" }), /more than one pending claimant confirmation/);
+  assert.equal(server.requests.filter((r) => r.method === "POST").length, 0);
+
+  const reordered = fakeServer(packet);
+  const participantsReversed = async (input: Parameters<typeof fetch>[0], init?: RequestInit) => {
+    const response = await reordered.fetchImpl(input, init);
+    if ((init?.method ?? "GET") !== "GET") return response;
+    const body = await response.json() as { data: Record<string, any> };
+    body.data.participants.reverse();
+    body.data.participants.unshift({ participantId: "pcase_1:claimant:observer", side: "claimant", principalId: "observer", agentId: "observer-agent" });
+    return new Response(JSON.stringify(body), { status: 200 });
+  };
+  await createPeopleCourtAdjudicationAdapter(createPeopleCourtHttpTransport({ baseUrl: BASE, apiKey: "pc_test_key", fetch: participantsReversed }))
+    .confirm("pfd_1", { confirmationReference: "x402:ref", idempotencyKey: "confirm-key-0002" });
+  const sent = reordered.requests.find((r) => r.method === "POST")!.json!;
+  assert.equal(sent.participantId, "pcase_1:claimant");
+  assert.equal(sent.principalId, BUYER);
+  assert.equal(sent.actorId, "merchant-agent");
+}
+
+// Transport edges: base path prefix, Idempotency-Key grammar, redirects, Retry-After.
+{
+  const seen: string[] = [];
+  const echo: typeof fetch = async (input) => {
+    seen.push(String(input));
+    return new Response(JSON.stringify({ data: { caseId: "pcase_1" } }), { status: 200 });
+  };
+  await createPeopleCourtHttpTransport({ baseUrl: "https://court.example/forum", apiKey: "k", fetch: echo }).getCase("pcase_1");
+  assert.equal(seen[0], "https://court.example/forum/api/cases/pcase_1");
+
+  await assert.rejects(
+    () => createPeopleCourtHttpTransport({ baseUrl: BASE, apiKey: "k", fetch: echo }).confirmFiling("pfd_1", {} as never, "short"),
+    /idempotencyKey must be 8-128/,
+  );
+  assert.equal(seen.length, 1, "an invalid key never reaches the API");
+
+  const redirecting: typeof fetch = async () => new Response(null, { status: 308, headers: { location: "https://www.court.example/api/cases/pcase_1" } });
+  await assert.rejects(
+    () => createPeopleCourtHttpTransport({ baseUrl: "https://court.example", apiKey: "k", fetch: redirecting }).getCase("pcase_1"),
+    /redirected to https:\/\/www\.court\.example/,
+  );
+
+  const limited: typeof fetch = async () => new Response(JSON.stringify({ status: 429, code: "rate_limited" }), { status: 429, headers: { "retry-after": "7" } });
+  await assert.rejects(
+    () => createPeopleCourtHttpTransport({ baseUrl: BASE, apiKey: "k", fetch: limited }).getCase("pcase_1"),
+    (error: unknown) => error instanceof PeopleCourtApiError && error.status === 429 && error.retryAfterSeconds === 7,
+  );
+}
+
+// Whole USD cents only: the canonical claimAmount is an integer number of cents.
+{
+  assert.equal(usdDecimalToMinorUnits("25"), "2500");
+  assert.equal(usdDecimalToMinorUnits("25.5"), "2550");
+  assert.equal(usdDecimalToMinorUnits("0.01"), "1");
+  assert.equal(usdDecimalToMinorUnits("1.10"), "110");
+  assert.equal(usdDecimalToMinorUnits("1.005"), null);
+  for (const invalid of ["", "1.", "00.5", "1e3", "-1", " 1"]) assert.equal(usdDecimalToMinorUnits(invalid), null, invalid);
+  assert.equal(usdDecimalToMinorUnits("0.00"), "0", "zero converts; the adapter refuses it");
 }
 
 console.log("✓ hosted filing transport matches the published People’s Court OpenAPI contract");

@@ -76,7 +76,7 @@ export function createHostedX402Filing(config: {
       return adjudication.submitPacketEvidence(
         caseId,
         { packet },
-        `exhibit-${caseId}-${packet.packetHash}`,
+        `exhibit-${packet.packetHash}`,
       );
     },
 

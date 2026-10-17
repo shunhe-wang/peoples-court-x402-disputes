@@ -557,6 +557,10 @@ async function x402rCompositionContract(): Promise<void> {
     () => adapter.prepare(filingInput(packet, "prepare-x402r-0001")),
     /existing x402r referral path/,
   );
+  await assert.rejects(
+    () => adapter.submitPacketEvidence("pcase_x402r", { packet }, "evidence-x402r-0001"),
+    /existing x402r referral path/,
+  );
 }
 
 async function signedArtifactContract(): Promise<void> {
@@ -838,7 +842,8 @@ async function adapterContract(packet: X402DisputePacketV1): Promise<void> {
   assert.match(exhibit.brief, new RegExp(packet.packetHash));
   assert.match(exhibit.brief, /did not independently verify/);
   assert.equal(exhibit.files.length, 1);
-  assert.equal(exhibit.files[0]?.mediaType, "application/json");
+  assert.equal(exhibit.files[0]?.mediaType, "text/plain");
+  assert.match(exhibit.files[0]?.filename ?? "", /^x402-dispute-packet-[0-9a-f]{16}\.txt$/);
   const filed = JSON.parse(
     new TextDecoder().decode(exhibit.files[0]?.bytes),
   ) as X402DisputePacketV1;

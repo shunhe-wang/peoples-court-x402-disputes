@@ -17,9 +17,15 @@ export class PeopleCourtApiError extends Error {
   readonly status: number;
   readonly code?: string;
   readonly requestId?: string;
+  /** Seconds from a `Retry-After` header, for 429 and 503 responses. */
+  readonly retryAfterSeconds?: number;
+  /**
+   * The full problem body. For `acceptance_required`, `details` carries a
+   * fresh `hostedAcceptanceUrl` (relative to the forum origin).
+   */
   readonly problem: Record<string, unknown>;
 
-  constructor(status: number, problem: Record<string, unknown>) {
+  constructor(status: number, problem: Record<string, unknown>, retryAfterSeconds?: number) {
     const detail = typeof problem.detail === "string" ? problem.detail : "";
     const code = typeof problem.code === "string" ? problem.code : undefined;
     super(`People’s Court API ${status}${code ? ` ${code}` : ""}${detail ? `: ${detail}` : ""}`);
@@ -28,8 +34,12 @@ export class PeopleCourtApiError extends Error {
     this.problem = problem;
     if (code !== undefined) this.code = code;
     if (typeof problem.requestId === "string") this.requestId = problem.requestId;
+    if (retryAfterSeconds !== undefined) this.retryAfterSeconds = retryAfterSeconds;
   }
 }
+
+/** The API's Idempotency-Key grammar. */
+const IDEMPOTENCY_KEY = /^[A-Za-z0-9._:-]{8,128}$/;
 
 function segment(value: string, label: string): string {
   if (typeof value !== "string" || !value.trim()) throw new Error(`${label} is required.`);
@@ -46,6 +56,10 @@ export function createPeopleCourtHttpTransport(
   options: PeopleCourtHttpTransportOptions,
 ): PeopleCourtPartnerTransport {
   const base = new URL(options.baseUrl);
+  // Keep any deployment path prefix: resolve operation paths below it.
+  if (!base.pathname.endsWith("/")) base.pathname = `${base.pathname}/`;
+  base.search = "";
+  base.hash = "";
   if (base.protocol !== "https:" && !["localhost", "127.0.0.1", "[::1]"].includes(base.hostname)) {
     throw new Error("baseUrl must use https outside localhost.");
   }
@@ -63,7 +77,9 @@ export function createPeopleCourtHttpTransport(
       ...init.headers,
     };
     if (init.idempotencyKey !== undefined) {
-      if (!init.idempotencyKey) throw new Error("idempotencyKey is required.");
+      if (!IDEMPOTENCY_KEY.test(init.idempotencyKey)) {
+        throw new Error("idempotencyKey must be 8-128 characters from A-Z, a-z, 0-9, '.', '_', ':' and '-'.");
+      }
       headers["idempotency-key"] = init.idempotencyKey;
     }
     let body: string | FormData | undefined;
@@ -77,8 +93,15 @@ export function createPeopleCourtHttpTransport(
       method,
       headers,
       ...(body === undefined ? {} : { body }),
-      redirect: "error",
+      // Never forward the credential or replay a mutation to a redirect target.
+      redirect: "manual",
     });
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get("location");
+      throw new Error(
+        `People’s Court API ${method} ${path} redirected${location ? ` to ${location}` : ""}; set baseUrl to the forum's canonical origin.`,
+      );
+    }
     const text = await response.text();
     let parsed: unknown;
     try {
@@ -87,9 +110,11 @@ export function createPeopleCourtHttpTransport(
       parsed = { detail: text.slice(0, 500) };
     }
     if (!response.ok) {
+      const retryAfter = Number(response.headers.get("retry-after"));
       throw new PeopleCourtApiError(
         response.status,
         parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : {},
+        Number.isFinite(retryAfter) && retryAfter >= 0 && response.headers.has("retry-after") ? retryAfter : undefined,
       );
     }
     const envelope = parsed as { data?: T; requestId?: string };
@@ -122,27 +147,27 @@ export function createPeopleCourtHttpTransport(
 
   return {
     async prepareFiling(input, idempotencyKey) {
-      const response = await request<PreparedAdjudicationFiling>("POST", "/api/filings", { json: input, idempotencyKey });
+      const response = await request<PreparedAdjudicationFiling>("POST", "api/filings", { json: input, idempotencyKey });
       return { ...response, data: withAbsoluteAcceptanceUrl(response.data) };
     },
     getFiling(draftId) {
-      return request("GET", `/api/filings/${segment(draftId, "draftId")}`);
+      return request("GET", `api/filings/${segment(draftId, "draftId")}`);
     },
     confirmFiling(draftId, input, idempotencyKey) {
-      return request("POST", `/api/filings/${segment(draftId, "draftId")}/confirmations`, { json: input, idempotencyKey });
+      return request("POST", `api/filings/${segment(draftId, "draftId")}/confirmations`, { json: input, idempotencyKey });
     },
     submitEvidence(caseId, input, idempotencyKey) {
-      return request("POST", `/api/cases/${segment(caseId, "caseId")}/submissions`, {
+      return request("POST", `api/cases/${segment(caseId, "caseId")}/submissions`, {
         form: submissionForm(input),
         idempotencyKey,
         headers: { "x-pc-party": input.party },
       });
     },
     getCase(caseId) {
-      return request("GET", `/api/cases/${segment(caseId, "caseId")}`);
+      return request("GET", `api/cases/${segment(caseId, "caseId")}`);
     },
     getServedAward(caseId) {
-      return request("GET", `/api/cases/${segment(caseId, "caseId")}/award`);
+      return request("GET", `api/cases/${segment(caseId, "caseId")}/award`);
     },
   };
 }

@@ -18,10 +18,14 @@ export const X402_FILING_METADATA_KEYS = {
 
 const RESERVED_METADATA_PREFIX = "x402.";
 
-export const X402_PACKET_EVIDENCE_MEDIA_TYPE = "application/json";
+/**
+ * Plain text, because deployments with durable evidence capture accept only
+ * UTF-8 `.txt` attachments. The content is the packet's canonical JSON.
+ */
+export const X402_PACKET_EVIDENCE_MEDIA_TYPE = "text/plain";
 
 export function x402PacketEvidenceFilename(packet: X402DisputePacketV1): string {
-  return `x402-dispute-packet-${packet.packetHash.slice(0, 16)}.json`;
+  return `x402-dispute-packet-${packet.packetHash.slice(0, 16)}.txt`;
 }
 
 /**
@@ -37,7 +41,7 @@ export function defaultX402PacketEvidenceBrief(packet: X402DisputePacketV1): str
     `Exhibit: x402 dispute packet version ${packet.version} for transaction ${packet.transactionId}.`,
     `Packet hash: ${packet.packetHash}. The same hash was recorded in this filing's metadata (${X402_FILING_METADATA_KEYS.packetHash}) before the filing was confirmed.`,
     "The claimant's software (@peoples-court/x402-disputes) built this packet and checked its integrity and any EIP-712 offer or receipt signatures. People's Court did not independently verify the packet.",
-    "Anyone can recompute the hash from the attached canonical JSON and recover EIP-712 signers offline.",
+    "The attached text file is the packet's canonical JSON. Anyone can recompute the hash from it and recover EIP-712 signers offline.",
   ].join("\n");
 }
 
@@ -48,6 +52,38 @@ async function verifiedPacket(
   const verified = await verifyX402DisputePacketIntegrity(packet, options);
   if (!verified.valid) throw new PeopleCourtDisputeValidationError(verified.errors);
   return verified.value;
+}
+
+/** Packet properties the hosted filing path refuses, for filing and exhibits alike. */
+function hostedFilingRefusals(packet: X402DisputePacketV1): string[] {
+  const errors: string[] = [];
+  if (packet.rail === "x402r") {
+    errors.push(
+      "x402r transactions must use the existing x402r referral path instead of Partner API filing.",
+    );
+  }
+  if (
+    !["clickthrough", "signed_document"].includes(
+      packet.acceptance.proof.method,
+    )
+  ) {
+    errors.push(
+      "The hosted People’s Court filing adapter supports only clickthrough and signed_document acceptance until complete wallet and agent signature material can be retained and verified.",
+    );
+  }
+  // The hosted service has no trusted JWS identity policy, so a JWS artifact
+  // labelled verified by the caller's verifier is not filed as verified.
+  for (const [label, artifact] of [
+    ["offer", packet.offer],
+    ["receipt", packet.receipt],
+  ] as const) {
+    if (artifact?.status === "verified" && artifact.artifact?.format === "jws") {
+      errors.push(
+        `The hosted filing adapter does not file a packet whose ${label} claims a verified JWS signature; use EIP-712 or leave the JWS unverified.`,
+      );
+    }
+  }
+  return errors;
 }
 
 export function createPeopleCourtAdjudicationAdapter(
@@ -70,33 +106,7 @@ export function createPeopleCourtAdjudicationAdapter(
   return {
     async prepare(input) {
       const packet = await verifiedPacket(input.packet, verificationOptions);
-      const errors: string[] = [];
-      if (packet.rail === "x402r") {
-        errors.push(
-          "x402r transactions must use the existing x402r referral path instead of Partner API filing.",
-        );
-      }
-      if (
-        !["clickthrough", "signed_document"].includes(
-          packet.acceptance.proof.method,
-        )
-      ) {
-        errors.push(
-          "The hosted People’s Court filing adapter supports only clickthrough and signed_document acceptance until complete wallet and agent signature material can be retained and verified.",
-        );
-      }
-      // The hosted service has no trusted JWS identity policy, so a JWS artifact
-      // labelled verified by the caller's verifier is not filed as verified.
-      for (const [label, artifact] of [
-        ["offer", packet.offer],
-        ["receipt", packet.receipt],
-      ] as const) {
-        if (artifact?.status === "verified" && artifact.artifact?.format === "jws") {
-          errors.push(
-            `The hosted filing adapter does not file a packet whose ${label} claims a verified JWS signature; use EIP-712 or leave the JWS unverified.`,
-          );
-        }
-      }
+      const errors = hostedFilingRefusals(packet);
       if (
         input.parties.claimant.externalId !== packet.parties.claimantId ||
         input.parties.respondent.externalId !== packet.parties.respondentId
@@ -146,15 +156,23 @@ export function createPeopleCourtAdjudicationAdapter(
 
     async confirm(draftId, input) {
       const draft = (await transport.getFiling(draftId)).data;
-      const confirmation = draft.confirmations?.find(
-        (row) => row.side === "claimant",
+      const pending = (draft.confirmations ?? []).filter(
+        (row) => row.side === "claimant" && row.required && row.status === "pending",
       );
-      const participant = draft.participants?.find(
-        (row) => row.side === "claimant",
-      );
-      if (!confirmation || !participant) {
+      if (pending.length !== 1) {
         throw new Error(
-          "The filing draft does not list a claimant participant to confirm.",
+          pending.length === 0
+            ? "The filing draft has no pending claimant confirmation."
+            : "The filing draft has more than one pending claimant confirmation; confirm each participant directly with the transport.",
+        );
+      }
+      const confirmation = pending[0]!;
+      const participant = draft.participants?.find(
+        (row) => row.participantId === confirmation.participantId,
+      );
+      if (!participant) {
+        throw new Error(
+          "The filing draft does not list the participant for its claimant confirmation.",
         );
       }
       const actorId = input.actorId ?? participant.agentId;
@@ -182,6 +200,8 @@ export function createPeopleCourtAdjudicationAdapter(
 
     async submitPacketEvidence(caseId, input, idempotencyKey) {
       const packet = await verifiedPacket(input.packet, verificationOptions);
+      const errors = hostedFilingRefusals(packet);
+      if (errors.length) throw new PeopleCourtDisputeValidationError(errors);
       return submitEvidence(
         caseId,
         {
