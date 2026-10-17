@@ -15,7 +15,8 @@ The validators reject unknown fields, malformed identifiers, non-canonical times
 
 Resource server hooks abort verification and settlement when the required acceptance is missing or does not match the exact declaration, resource, and selected payment requirement.
 
-Partner API intake independently revalidates persisted packets at prepare and confirm time.
+The hosted filing adapter reverifies packet integrity before preparing a filing and again before filing the packet exhibit.
+The hosted People’s Court service does not parse or verify the packet; it stores the packet hash in the confirmed filing’s metadata and the exhibit bytes as claimant evidence.
 
 ## Proof status
 
@@ -25,7 +26,7 @@ For an EIP-712 offer or receipt, it means the signature was reverified and the e
 
 For JWS, it means the caller-supplied verifier returned a payload that matches the packet during the current integrity check.
 The caller must supply that verifier again at every later integrity boundary.
-The current Partner API rejects packets claiming verified JWS artifacts because its service has no trusted JWS identity-verification policy yet.
+The hosted filing adapter refuses packets claiming verified JWS artifacts because the hosted service has no trusted JWS identity-verification policy yet.
 
 It does not prove that a key was authorized to represent a merchant, that an agent had delegated authority, or that performance was satisfactory.
 
@@ -41,9 +42,10 @@ Cryptographic or durable clickthrough verification is application-specific.
 
 Production resource servers should provide `verifyAcceptanceProof`.
 
-The People’s Court Partner API also requires the acceptance artifact to match a separately registered claimant consent record.
+The People’s Court API separately requires a registered claimant consent record for the same transaction, parties, Rules, and procedure terms, and the claimant’s hosted acceptance of the exact filing.
+It does not compare that record with the packet’s acceptance artifact; register the consent record with the packet’s acceptance artifact hash and declaration terms hash so the two can be reconciled.
 
-It separately requires respondent consent.
+Respondent consent is either a registered record or the respondent’s hosted acceptance of the pinned case terms.
 
 An API key is never sufficient authority to file for another principal.
 

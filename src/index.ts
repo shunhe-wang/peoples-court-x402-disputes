@@ -5,7 +5,10 @@ export {
   canonicalSha256,
   packetHashPayload,
 } from "./canonical.js";
-export { decimalAmountMatchesNumber } from "./amount.js";
+export {
+  decimalAmountMatchesNumber,
+  usdDecimalToMinorUnits,
+} from "./amount.js";
 export {
   findSelectedSignedOffer,
   inspectSignedOffer,
@@ -27,7 +30,19 @@ export {
   buildX402DisputePacket,
   verifyX402DisputePacketIntegrity,
 } from "./packet.js";
-export { createPeopleCourtAdjudicationAdapter } from "./adapter.js";
+export {
+  createPeopleCourtAdjudicationAdapter,
+  defaultX402PacketEvidenceBrief,
+  X402_FILING_METADATA_KEYS,
+  X402_PACKET_EVIDENCE_MEDIA_TYPE,
+  x402PacketEvidenceBytes,
+  x402PacketEvidenceFilename,
+} from "./adapter.js";
+export {
+  createPeopleCourtHttpTransport,
+  PeopleCourtApiError,
+  type PeopleCourtHttpTransportOptions,
+} from "./http-transport.js";
 export { reportServedX402Award } from "./award.js";
 export {
   peopleCourtDisputeExtensionSchema,

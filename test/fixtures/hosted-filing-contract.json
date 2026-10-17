@@ -1,0 +1,144 @@
+{
+  "source": {
+    "repository": "shunhe-wang/arbitrator-ai",
+    "commit": "7bf8c920d",
+    "path": "public/openapi/peoples-court.json",
+    "sha256": "ae4cb37a69be2124a98eaa62c52d8780b53b17ebb911d6cfc14ea11e746209f2",
+    "extractedAt": "2026-10-17"
+  },
+  "operations": {
+    "POST /api/filings": {
+      "required": [
+        "authorityGrantId",
+        "claimAmount",
+        "claimantAcceptanceIdentity",
+        "confirmationPolicy",
+        "consentArtifactIds",
+        "externalCaseId",
+        "intakeMode",
+        "parties",
+        "policyVersion",
+        "transactionId"
+      ],
+      "properties": [
+        "appealWaived",
+        "authorityGrantId",
+        "backgroundFacts",
+        "caseMode",
+        "caseTrack",
+        "claim",
+        "claimAmount",
+        "claimantAcceptanceIdentity",
+        "confirmationPolicy",
+        "consentArtifactIds",
+        "evaluation",
+        "externalCaseId",
+        "feeReferralAuthorizationId",
+        "intakeMode",
+        "metadata",
+        "participants",
+        "parties",
+        "policyVersion",
+        "procedure",
+        "schedule",
+        "sponsorshipReferralId",
+        "summary",
+        "transactionId"
+      ],
+      "headers": [
+        {
+          "name": "Idempotency-Key",
+          "required": true
+        }
+      ],
+      "party": {
+        "required": [
+          "externalId",
+          "name",
+          "principalKind"
+        ],
+        "properties": [
+          "accountId",
+          "externalId",
+          "name",
+          "principalKind"
+        ]
+      },
+      "principalKind": [
+        "individual",
+        "organization",
+        "autonomous_agent"
+      ],
+      "claimAmount": {
+        "required": [
+          "currency",
+          "minorUnits"
+        ],
+        "currency": "USD",
+        "minorUnitsPattern": "^(0|[1-9][0-9]{0,77})$"
+      },
+      "metadataValueType": "string"
+    },
+    "POST /api/filings/{id}/confirmations": {
+      "required": [
+        "actorId",
+        "confirmationMethod",
+        "confirmationReference",
+        "confirmationStatement",
+        "draftDigest",
+        "participantId",
+        "principalId"
+      ],
+      "properties": [
+        "acceptance",
+        "actorId",
+        "confirmationMethod",
+        "confirmationReference",
+        "confirmationStatement",
+        "draftDigest",
+        "participantId",
+        "principalId"
+      ],
+      "headers": [
+        {
+          "name": "Idempotency-Key",
+          "required": true
+        }
+      ]
+    },
+    "POST /api/cases/{id}/submissions": {
+      "required": [
+        "brief",
+        "party"
+      ],
+      "properties": [
+        "attest",
+        "brief",
+        "declarantCapacity",
+        "declarantName",
+        "evidenceCandidateRefs",
+        "executionLocation",
+        "files",
+        "party"
+      ],
+      "headers": [
+        {
+          "name": "Idempotency-Key",
+          "required": false
+        },
+        {
+          "name": "x-pc-party",
+          "required": false
+        },
+        {
+          "name": "x-arb-party-token",
+          "required": false
+        }
+      ]
+    }
+  },
+  "retiredPrefixes": [
+    "/api/v1/",
+    "/api/v2/"
+  ]
+}
