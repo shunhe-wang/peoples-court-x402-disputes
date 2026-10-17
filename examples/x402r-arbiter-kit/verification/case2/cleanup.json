@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-17T13:48:04.948Z",
+  "stoppedPids": [
+    16403,
+    17137,
+    35860,
+    14783
+  ],
+  "roles": {
+    "firstApp": 16403,
+    "worker": 17137,
+    "settlementApp": 35860,
+    "merchant": 14783
+  },
+  "allStopped": true,
+  "databaseRetained": "tmp/kit2-verification.db.json"
+}

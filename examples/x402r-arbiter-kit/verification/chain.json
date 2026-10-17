@@ -1,0 +1,75 @@
+{
+  "chainId": 84532,
+  "paymentInfoHash": "0x28f5aa2ff740795450e0f6df57dacb4ab128b329f325a38cba2c317cdb965b13",
+  "paymentInfo": {
+    "operator": "0x80754BA4594aF01726ee8ce80F30B5362227eca7",
+    "payer": "0x6da64CDC42A5D8458e993ac7ff0613c2DbA288F6",
+    "receiver": "0x3987aA8b081e0A5a6772842aBeF203e4B42B831b",
+    "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+    "maxAmount": "10000",
+    "preApprovalExpiry": 1792243506,
+    "authorizationExpiry": 1795004706,
+    "refundExpiry": 1795004706,
+    "minFeeBps": 0,
+    "maxFeeBps": 100,
+    "feeReceiver": "0x80754BA4594aF01726ee8ce80F30B5362227eca7",
+    "salt": "36874825972452834949231428247721743865175629509808980691244126894145018085146"
+  },
+  "receipts": {
+    "authorizationTx": {
+      "hash": "0x39da5128c37b312c0b1e5e002488d70f7bdd03c62939d78a9d2ae05ca2610e47",
+      "status": "success",
+      "blockNumber": "48235810",
+      "timestamp": "2026-10-17T12:25:08.000Z"
+    },
+    "refundRequestTx": {
+      "hash": "0xff7df26ccc0fde4d45d0cb321906414afb166140917b49d6171b87788bded345",
+      "status": "success",
+      "blockNumber": "48235823",
+      "timestamp": "2026-10-17T12:25:34.000Z"
+    },
+    "evidenceTx": {
+      "hash": "0x6a7f801c781004fda99c9de0ca46097c454884e95070ff64f4a7b7c27d0cf1e4",
+      "status": "success",
+      "blockNumber": "48235825",
+      "timestamp": "2026-10-17T12:25:38.000Z"
+    }
+  },
+  "evidence": {
+    "submitter": "0x6da64CDC42A5D8458e993ac7ff0613c2DbA288F6",
+    "role": 0,
+    "timestamp": 1792239938,
+    "contents": {
+      "reason": "This is a testnet integration dispute. The merchant offered weather with a numeric temperature for 0.01 USDC. The paid response returned temperature:null and upstream unavailable. I request a full refund because the promised numeric temperature was not delivered. The paid response is attached verbatim.",
+      "deliverable": "{\"location\":\"Testnet fixture\",\"temperature\":null,\"error\":\"upstream unavailable\"}",
+      "paymentInfoHash": "0x28f5aa2ff740795450e0f6df57dacb4ab128b329f325a38cba2c317cdb965b13",
+      "authorizationTx": "0x39da5128c37b312c0b1e5e002488d70f7bdd03c62939d78a9d2ae05ca2610e47",
+      "refundRequestTx": "0xff7df26ccc0fde4d45d0cb321906414afb166140917b49d6171b87788bded345"
+    },
+    "sha256": "4b2f4f310fcaf39c328d941721b3cab65fbe1374a631cc19331f1e355271b125"
+  },
+  "paymentAuthorizedAt": "2026-10-17T12:25:08.000Z",
+  "escrowWindowEndsAt": "2026-11-17T12:25:08.000Z",
+  "holdSeconds": "2678400",
+  "state": [
+    true,
+    "10000",
+    "0"
+  ],
+  "operatorConfig": {
+    "escrow": "0xBdEA0D1bcC5966192B070Fdf62aB4EF5b4420cff",
+    "authorizeCondition": "0x0000000000000000000000000000000000000000",
+    "authorizeHook": "0x4141FF7aB733Ea7AB6f6De3D9243cfBb17eF2032",
+    "chargeCondition": "0x0000000000000000000000000000000000000000",
+    "chargeHook": "0x0000000000000000000000000000000000000000",
+    "captureCondition": "0xC35B357e04Fe01349161641da220e6a1aB03cC87",
+    "captureHook": "0x0000000000000000000000000000000000000000",
+    "voidCondition": "0xf1ffBa161c55b91a28f42095be796B32aED893A7",
+    "voidHook": "0x0000000000000000000000000000000000000000",
+    "refundCondition": "0x321651df4593DA57C413579c5b611D1A90168a3A",
+    "refundHook": "0x0000000000000000000000000000000000000000",
+    "feeCalculator": "0x0000000000000000000000000000000000000000",
+    "feeReceiver": "0x3987aA8b081e0A5a6772842aBeF203e4B42B831b",
+    "protocolFeeConfig": "0xBe2d24614F339a1eB103A399F93AA2a39Ca815Bc"
+  }
+}

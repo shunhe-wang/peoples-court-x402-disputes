@@ -1,0 +1,246 @@
+{
+  "environment": {
+    "at": "2026-10-17T13:19:49.073Z",
+    "updates": {
+      "APP_URL": "http://localhost:3417",
+      "PUBLIC_DEMO_ENABLED": "false",
+      "LEGAL_RESEARCH_ARCHITECTURE": "shared_clerk_judge_research_v2",
+      "NODE_ENV": "development",
+      "ADJUDICATION_EXECUTION_MODE": "queue",
+      "X402R_VERIFY_REFERRALS": "true",
+      "X402R_ALLOW_SYNTHETIC_PAYMENT_STATE": "false"
+    },
+    "pricingPreserved": true
+  },
+  "preflight": [
+    {
+      "at": "2026-10-17T13:19:57.311Z",
+      "method": "GET",
+      "pathname": "/api/ready",
+      "status": 200,
+      "body": {
+        "ok": true,
+        "status": "ready",
+        "details": {
+          "rulesVersion": "1.1",
+          "backend": "json",
+          "checks": [
+            {
+              "name": "store",
+              "ok": true,
+              "detail": "json"
+            },
+            {
+              "name": "llm",
+              "ok": true,
+              "detail": "provider=zai keyPresent=true effectiveMock=false"
+            },
+            {
+              "name": "research",
+              "ok": true,
+              "detail": "direct Z.ai key reused"
+            },
+            {
+              "name": "model_configuration",
+              "ok": true,
+              "detail": "no retired or invalid model variables"
+            },
+            {
+              "name": "metadata_parsers",
+              "ok": true,
+              "detail": "3 parsers resolve"
+            },
+            {
+              "name": "admitted_image_delivery",
+              "ok": true,
+              "detail": "0 open image-dependent case(s); assigned image delivery available"
+            },
+            {
+              "name": "deployment",
+              "ok": true,
+              "detail": "valid"
+            },
+            {
+              "name": "rules",
+              "ok": true,
+              "detail": "v1.1 sha256=fea33523dd43c2ce6c48db95920df052c9098f6d29938eb83ffb7ae864fa6925"
+            },
+            {
+              "name": "schema",
+              "ok": true,
+              "detail": "json backend (no schema to verify)"
+            },
+            {
+              "name": "database_environment",
+              "ok": true,
+              "detail": "json backend (no marker to verify)"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "at": "2026-10-17T13:19:57.320Z",
+      "method": "GET",
+      "pathname": "/api/admin/disputes/dis_502a58eb-6de0-469c-a652-5afccebe1498/adjudication-restart",
+      "status": 200,
+      "body": {
+        "ok": true,
+        "data": {
+          "eligible": false,
+          "refusals": [
+            "attention_not_restartable",
+            "merits_output_exists",
+            "no_held_run"
+          ],
+          "status": "procedure_hold",
+          "revision": 18,
+          "sourceRun": {
+            "id": "run_once_36e470bb19de7e0fe565ac59c161ceca",
+            "status": "succeeded",
+            "attempt": 1,
+            "disputeStatusAtStart": "submissions_complete"
+          },
+          "heldStages": [
+            {
+              "key": "party_fast_attempt",
+              "outcome": "failed",
+              "error": "AdjudicationCostBudgetConfigurationError"
+            }
+          ],
+          "blockingKeyFamilies": [],
+          "requiresUnknownCompletionAcknowledgement": false,
+          "restartsUsed": 0,
+          "maxRestarts": 2,
+          "priorUsage": {
+            "spent": 0,
+            "calls": 0
+          },
+          "refusalText": [
+            "The hold has another cause with its own cure; only an interrupted adjudication stage can be restarted.",
+            "An opinion, disposition or fast memorandum exists; merits work cannot be restarted.",
+            "The latest run is not a technical failure."
+          ],
+          "restarts": []
+        }
+      }
+    }
+  ],
+  "adminRestart": {
+    "at": "2026-10-17T13:25:53.611Z",
+    "method": "POST",
+    "pathname": "/api/admin/disputes/dis_502a58eb-6de0-469c-a652-5afccebe1498/adjudication-restart",
+    "request": {
+      "expectedRevision": 18,
+      "sourceRunId": "run_once_36e470bb19de7e0fe565ac59c161ceca",
+      "reason": "Orchestrator supplied real model pricing and authorized local readiness repair for this testnet case; resume assigned AI adjudication without changing Record or finality."
+    },
+    "status": 409,
+    "body": {
+      "ok": false,
+      "code": "restart_refused",
+      "error": "The hold has another cause with its own cure; only an interrupted adjudication stage can be restarted. An opinion, disposition or fast memorandum exists; merits work cannot be restarted. The latest run is not a technical failure.",
+      "data": {
+        "refusals": [
+          "attention_not_restartable",
+          "merits_output_exists",
+          "no_held_run"
+        ]
+      }
+    }
+  },
+  "ordinaryAdminRetry": {
+    "at": "2026-10-17T13:26:06.992Z",
+    "method": "POST",
+    "pathname": "/api/disputes/dis_502a58eb-6de0-469c-a652-5afccebe1498/adjudicate",
+    "status": 202,
+    "ok": true,
+    "runId": "run_5989855b-52b1-4938-b2cd-613f87c7726e",
+    "queued": true
+  },
+  "workerResult": {
+    "at": "2026-10-17T13:26:45.411Z",
+    "run": {
+      "id": "run_5989855b-52b1-4938-b2cd-613f87c7726e",
+      "status": "failed",
+      "failureKind": "technical_failure",
+      "error": "Error: Frozen adjudication Record differs from its saved work.",
+      "attempt": 1,
+      "logs": [
+        {
+          "at": "2026-10-17T13:26:06.988Z",
+          "level": "info",
+          "message": "Adjudication run queued."
+        },
+        {
+          "at": "2026-10-17T13:26:21.691Z",
+          "level": "info",
+          "message": "Worker claimed and started adjudication pipeline."
+        },
+        {
+          "at": "2026-10-17T13:26:22.298Z",
+          "level": "warning",
+          "message": "Dispute rolled back from 'triaged' to 'procedure_hold' after technical failure."
+        },
+        {
+          "at": "2026-10-17T13:26:22.299Z",
+          "level": "error",
+          "message": "Worker failed adjudication pipeline."
+        },
+        {
+          "at": "2026-10-17T13:26:22.301Z",
+          "level": "error",
+          "message": "Bounded automatic retries are exhausted. The run is in a typed technical hold; an operator may repair and start a fresh bounded AI run but may not decide the merits."
+        }
+      ],
+      "createdAt": "2026-10-17T13:26:06.988Z",
+      "completedAt": "2026-10-17T13:26:22.296Z"
+    },
+    "case": {
+      "id": "dis_502a58eb-6de0-469c-a652-5afccebe1498",
+      "status": "procedure_hold",
+      "revision": 22,
+      "adjudicationAttention": [
+        {
+          "kind": "technical_hold",
+          "code": "interrupted_adjudication_stage"
+        }
+      ],
+      "dispositionId": "awd_32d8afd7-b1b8-4cd2-bbc7-50fee20b151b",
+      "releasedToParties": false,
+      "executeAfter": null,
+      "allocation": null,
+      "modelCalls": 0,
+      "adjudicationEvents": [
+        {
+          "key": "party_fast_attempt",
+          "status": "started"
+        },
+        {
+          "key": "party_fast_attempt",
+          "status": "failed",
+          "data": {
+            "error": "AdjudicationCostBudgetConfigurationError"
+          }
+        }
+      ]
+    }
+  },
+  "chain": {
+    "chainId": 84532,
+    "paymentInfoHash": "0x28f5aa2ff740795450e0f6df57dacb4ab128b329f325a38cba2c317cdb965b13",
+    "hasCollectedPayment": true,
+    "capturableAmountBaseUnits": "10000",
+    "refundableAmountBaseUnits": "0",
+    "blockNumber": "48237675",
+    "observedAt": "2026-10-17T13:27:19.216Z"
+  },
+  "databaseDirectlyEdited": false,
+  "finalityFieldsUnchanged": true,
+  "procedureTermsUnchanged": true,
+  "settlementSweepRun": false,
+  "processesStopped": [
+    80717,
+    82726
+  ]
+}

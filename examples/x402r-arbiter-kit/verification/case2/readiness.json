@@ -1,0 +1,64 @@
+{
+  "at": "2026-10-17T13:41:18.810Z",
+  "status": 200,
+  "body": {
+    "ok": true,
+    "status": "ready",
+    "details": {
+      "rulesVersion": "1.1",
+      "backend": "json",
+      "checks": [
+        {
+          "name": "store",
+          "ok": true,
+          "detail": "json"
+        },
+        {
+          "name": "llm",
+          "ok": true,
+          "detail": "provider=zai keyPresent=true effectiveMock=false"
+        },
+        {
+          "name": "research",
+          "ok": true,
+          "detail": "direct Z.ai key reused"
+        },
+        {
+          "name": "model_configuration",
+          "ok": true,
+          "detail": "no retired or invalid model variables"
+        },
+        {
+          "name": "metadata_parsers",
+          "ok": true,
+          "detail": "3 parsers resolve"
+        },
+        {
+          "name": "admitted_image_delivery",
+          "ok": true,
+          "detail": "0 open image-dependent case(s); assigned image delivery available"
+        },
+        {
+          "name": "deployment",
+          "ok": true,
+          "detail": "valid"
+        },
+        {
+          "name": "rules",
+          "ok": true,
+          "detail": "v1.1 sha256=fea33523dd43c2ce6c48db95920df052c9098f6d29938eb83ffb7ae864fa6925"
+        },
+        {
+          "name": "schema",
+          "ok": true,
+          "detail": "json backend (no schema to verify)"
+        },
+        {
+          "name": "database_environment",
+          "ok": true,
+          "detail": "json backend (no marker to verify)"
+        }
+      ]
+    }
+  }
+}
