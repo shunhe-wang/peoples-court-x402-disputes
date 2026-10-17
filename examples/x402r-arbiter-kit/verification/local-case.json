@@ -1,0 +1,85 @@
+{
+  "appRevision": "7bf8c920d22c8b59cc293dbaa9a61445088be0a4",
+  "caseId": "dis_502a58eb-6de0-469c-a652-5afccebe1498",
+  "status": "procedure_hold",
+  "procedureTerms": {
+    "schemaVersion": "case-procedure-v1",
+    "track": "ai_fast",
+    "appealWaived": false,
+    "waiverDisclosureVersion": "appeal-waiver-2026-09-25-v1",
+    "waiverDisclosureHash": "1daae09634406ab67884e39eee65a06bcb78abc6ff8b1e404dbbbc21154af237",
+    "rulesVersion": "1.1",
+    "rulesHash": "fea33523dd43c2ce6c48db95920df052c9098f6d29938eb83ffb7ae864fa6925",
+    "behaviorVersion": "behavior-1.7-legal-research-sections",
+    "disclosureVersion": "case-tier-disclosure-2026-10-11-ai_fast",
+    "disclosureHash": "3c2aeb7b14b992cb079ebb74f7d8cde07424a2c25595ba37ef2b7bc76e06b15f",
+    "feePolicyVersion": "caseplan-1.7-card-inclusive-pricing",
+    "termsHash": "e73e8bde709d408319930a402e29dae3bcd943fbb76810579246d7068d7141bd"
+  },
+  "service": {
+    "status": "proven",
+    "method": "participation",
+    "provenAt": "2026-10-17T12:25:59.750Z"
+  },
+  "threshold": {
+    "decision": "proceed",
+    "consentValid": true,
+    "inScope": true,
+    "reasoning": "Both parties signed a valid consent-to-arbitrate attestation covering this dispute."
+  },
+  "reasonCodes": [
+    "assigned_ai_decides",
+    "human_appeal_retained",
+    "cost_budget_configuration_error"
+  ],
+  "adjudicationEvents": [
+    {
+      "key": "party_fast_attempt",
+      "status": "started",
+      "usage": {
+        "entries": [],
+        "spent": 0
+      },
+      "at": "2026-10-17T12:26:37.950Z"
+    },
+    {
+      "key": "party_fast_attempt",
+      "status": "failed",
+      "data": {
+        "error": "AdjudicationCostBudgetConfigurationError"
+      },
+      "usage": {
+        "entries": [],
+        "spent": 0
+      },
+      "at": "2026-10-17T12:26:37.954Z"
+    }
+  ],
+  "disposition": {
+    "id": "awd_32d8afd7-b1b8-4cd2-bbc7-50fee20b151b",
+    "derivation": {
+      "method": "escalated",
+      "panelistsConsidered": [],
+      "majorityMembers": [],
+      "concurringMembers": [],
+      "dissenters": [],
+      "dissentRejectionReasons": [],
+      "sourceOpinionId": null,
+      "explanation": "Automated adjudication stopped at its configured compute budget. No merits disposition was issued; the recorded issue must be cured before an AI Tribunal rerun.",
+      "confidenceMode": "decorative"
+    },
+    "releasedToParties": false,
+    "executeAfter": null,
+    "usage": {
+      "calls": 0,
+      "promptTokens": 0,
+      "completionTokens": 0,
+      "totalTokens": 0,
+      "byTool": {},
+      "byStage": {},
+      "byModel": {},
+      "bySeat": {}
+    }
+  },
+  "observedAt": "2026-10-17T12:30:43.818Z"
+}

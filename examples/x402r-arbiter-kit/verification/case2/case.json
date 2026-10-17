@@ -1,0 +1,116 @@
+{
+  "caseId": "dis_15b1be10-b232-4e44-9b20-4a50df8ad6ce",
+  "status": "final_release_executed",
+  "run": {
+    "id": "run_once_097f6fa6381bf0d85a154ad2c57c1d93",
+    "status": "succeeded",
+    "step": "party_fast_attempt_accepted"
+  },
+  "exchangeClosedAt": "2026-10-17T13:42:17.215Z",
+  "exchangeClosedByOperator": true,
+  "feesWaived": true,
+  "service": {
+    "status": "proven",
+    "method": "participation",
+    "provenAt": "2026-10-17T13:42:01.898Z"
+  },
+  "rulesVersion": "1.1",
+  "rulesHash": "fea33523dd43c2ce6c48db95920df052c9098f6d29938eb83ffb7ae864fa6925",
+  "servedAt": "2026-10-17T13:42:34.587Z",
+  "executeAfter": "2026-10-17T13:45:10.322Z",
+  "awardHash": "c9354075b25824992426fa4697b078c9d01043f9e9381cf8951474b853fa4fe9",
+  "settlementExecution": {
+    "adapter": "x402r",
+    "action": "void",
+    "txHashes": [
+      "0x42abd48f2c8eecfcb4d67319bb300efab495a99c0a1ff89656abe40e9a21f348"
+    ],
+    "at": "2026-10-17T13:46:31.130Z",
+    "provenance": "test"
+  },
+  "finalizedAt": "2026-10-17T13:46:30.996Z",
+  "immutableAwardStillServedUnchanged": true,
+  "operation": [
+    {
+      "id": "exec_da123f4613c37ae93efae053f656034cc908f451ba361db595aa8b9a2e429bf9",
+      "status": "confirmed",
+      "adapter": "x402r",
+      "action": "void",
+      "attempts": 1,
+      "submissionAttempts": 1,
+      "createdAt": "2026-10-17T13:46:30.982Z",
+      "confirmedAt": "2026-10-17T13:46:30.996Z",
+      "execution": {
+        "adapter": "x402r",
+        "action": "void",
+        "txHashes": [
+          "0x42abd48f2c8eecfcb4d67319bb300efab495a99c0a1ff89656abe40e9a21f348"
+        ],
+        "at": "2026-10-17T13:46:31.130Z",
+        "provenance": "test"
+      }
+    }
+  ],
+  "audit": [
+    {
+      "id": "aud_fdb4f097-d0e7-44e2-b5bb-1b7e9d7b5d39",
+      "type": "exchange_closed",
+      "at": "2026-10-17T13:42:21.816Z",
+      "data": {
+        "forced": true,
+        "phase": "merits",
+        "effectiveAt": "2026-10-17T13:42:17.215Z",
+        "reason": "Fresh local testnet kit verification: both protocol parties have filed; close the completed exchange through the app operator path."
+      }
+    },
+    {
+      "id": "aud_5aece3f6-93f1-4d1f-b874-2f0c270287c1",
+      "type": "decision_released",
+      "at": "2026-10-17T13:42:34.587Z",
+      "data": {
+        "releasePath": "autonomous_single_arbiter",
+        "sourceAwardHash": "39f62312bb4bc167e04efe6b9b2ee3ad79b64de5e4dd6c7831b96099ba809962",
+        "servedAwardHash": "c9354075b25824992426fa4697b078c9d01043f9e9381cf8951474b853fa4fe9",
+        "executeAfter": "2026-10-24T13:42:34.587Z"
+      }
+    },
+    {
+      "id": "aud_2cbfbd3d-e424-4efa-b618-1178fd75b73e",
+      "type": "decision_served",
+      "at": "2026-10-17T13:42:34.587Z",
+      "data": {
+        "releasePath": "autonomous_single_arbiter",
+        "sourceAwardHash": "39f62312bb4bc167e04efe6b9b2ee3ad79b64de5e4dd6c7831b96099ba809962",
+        "servedAwardHash": "c9354075b25824992426fa4697b078c9d01043f9e9381cf8951474b853fa4fe9",
+        "executeAfter": "2026-10-24T13:42:34.587Z"
+      }
+    },
+    {
+      "id": "aud_5e86708b-0aa7-49ec-a1f3-97e48755431b",
+      "type": "adjudication_run_completed",
+      "at": "2026-10-17T13:42:34.882Z",
+      "data": {
+        "runId": "run_once_097f6fa6381bf0d85a154ad2c57c1d93",
+        "status": "served_awaiting_execution",
+        "attempt": 1
+      }
+    },
+    {
+      "id": "audit_db5820dd-1374-4972-bb30-4f2da5a83f2f",
+      "type": "settlement_executed",
+      "at": "2026-10-17T13:46:30.996Z",
+      "data": {
+        "operationKey": "settlement:awd_f97bec58-d75d-45b7-82c1-14c76ba79be7:c9354075b25824992426fa4697b078c9d01043f9e9381cf8951474b853fa4fe9:f50420dfb39cfa059159e4e833981442d18bac772579a972ee35ce5bec83eb20:x402r:0x0158c673a6fdc2b235ea469b74fb6ddc7f174ede92771b19522bfecebcee94fd",
+        "execution": {
+          "adapter": "x402r",
+          "action": "void",
+          "txHashes": [
+            "0x42abd48f2c8eecfcb4d67319bb300efab495a99c0a1ff89656abe40e9a21f348"
+          ],
+          "at": "2026-10-17T13:46:31.130Z",
+          "provenance": "test"
+        }
+      }
+    }
+  ]
+}

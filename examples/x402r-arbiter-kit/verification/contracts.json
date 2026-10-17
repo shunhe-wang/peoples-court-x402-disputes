@@ -1,0 +1,12 @@
+{
+  "operatorAddress": "0x80754BA4594aF01726ee8ce80F30B5362227eca7",
+  "escrowPeriodAddress": "0xCF07EA214145c8CE16182804086B07F0bed55798",
+  "arbiterConditionAddress": "0x81395B6C3C4882cCA67f723752f0D4297f051530",
+  "captureConditionAddress": "0xC35B357e04Fe01349161641da220e6a1aB03cC87",
+  "voidConditionAddress": "0xf1ffBa161c55b91a28f42095be796B32aED893A7",
+  "authorizeHookAddress": "0x4141FF7aB733Ea7AB6f6De3D9243cfBb17eF2032",
+  "paymentIndexRecorderHookAddress": "0x358ECA14fFD51e63D2Bb8DDE3aBAA14f8D5274C3",
+  "refundRequestAddress": "0x37ffe6eb9f57243e478C7B7bc23A8251E948baf4",
+  "refundRequestEvidenceAddress": "0xe388B6f6ED46310ECa5644D6A5218E284144c78A",
+  "signatureConditionAddress": "0xdbD7313a22ae62Ed532C3773fd2234a7237976F7"
+}

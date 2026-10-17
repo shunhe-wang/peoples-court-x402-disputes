@@ -1,0 +1,120 @@
+{
+  "preflight": [
+    {
+      "method": "GET",
+      "pathname": "/api/ready",
+      "status": 503,
+      "body": {
+        "ok": false,
+        "status": "not_ready",
+        "details": {
+          "rulesVersion": "1.1",
+          "backend": "json",
+          "checks": [
+            {
+              "name": "store",
+              "ok": true,
+              "detail": "json"
+            },
+            {
+              "name": "llm",
+              "ok": true,
+              "detail": "provider=zai keyPresent=true effectiveMock=false"
+            },
+            {
+              "name": "research",
+              "ok": true,
+              "detail": "direct Z.ai key reused"
+            },
+            {
+              "name": "model_configuration",
+              "ok": true,
+              "detail": "no retired or invalid model variables"
+            },
+            {
+              "name": "metadata_parsers",
+              "ok": true,
+              "detail": "3 parsers resolve"
+            },
+            {
+              "name": "admitted_image_delivery",
+              "ok": true,
+              "detail": "0 open image-dependent case(s); assigned image delivery available"
+            },
+            {
+              "name": "deployment",
+              "ok": false,
+              "detail": "invalid=app_url_missing,public_demo_shared_rate_limit_missing,legal_research_architecture_missing"
+            },
+            {
+              "name": "rules",
+              "ok": true,
+              "detail": "v1.1 sha256=fea33523dd43c2ce6c48db95920df052c9098f6d29938eb83ffb7ae864fa6925"
+            },
+            {
+              "name": "schema",
+              "ok": true,
+              "detail": "json backend (no schema to verify)"
+            },
+            {
+              "name": "database_environment",
+              "ok": true,
+              "detail": "json backend (no marker to verify)"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "case": {
+    "caseId": "dis_502a58eb-6de0-469c-a652-5afccebe1498",
+    "status": "procedure_hold",
+    "reasonCodes": [
+      "assigned_ai_decides",
+      "human_appeal_retained",
+      "cost_budget_configuration_error"
+    ],
+    "procedureTerms": {
+      "schemaVersion": "case-procedure-v1",
+      "track": "ai_fast",
+      "appealWaived": false,
+      "waiverDisclosureVersion": "appeal-waiver-2026-09-25-v1",
+      "waiverDisclosureHash": "1daae09634406ab67884e39eee65a06bcb78abc6ff8b1e404dbbbc21154af237",
+      "rulesVersion": "1.1",
+      "rulesHash": "fea33523dd43c2ce6c48db95920df052c9098f6d29938eb83ffb7ae864fa6925",
+      "behaviorVersion": "behavior-1.7-legal-research-sections",
+      "disclosureVersion": "case-tier-disclosure-2026-10-11-ai_fast",
+      "disclosureHash": "3c2aeb7b14b992cb079ebb74f7d8cde07424a2c25595ba37ef2b7bc76e06b15f",
+      "feePolicyVersion": "caseplan-1.7-card-inclusive-pricing",
+      "termsHash": "e73e8bde709d408319930a402e29dae3bcd943fbb76810579246d7068d7141bd"
+    },
+    "dispositionId": "awd_32d8afd7-b1b8-4cd2-bbc7-50fee20b151b",
+    "releasedToParties": false,
+    "executeAfter": null,
+    "modelCalls": 0,
+    "runs": [
+      {
+        "id": "run_once_36e470bb19de7e0fe565ac59c161ceca",
+        "status": "succeeded",
+        "attempt": 1
+      }
+    ],
+    "technicalRestartCount": 0,
+    "costEnvironmentOverridePresent": false,
+    "observedAt": "2026-10-17T12:37:47.241Z"
+  },
+  "chain": {
+    "chainId": 84532,
+    "paymentInfoHash": "0x28f5aa2ff740795450e0f6df57dacb4ab128b329f325a38cba2c317cdb965b13",
+    "hasCollectedPayment": true,
+    "capturableAmountBaseUnits": "10000",
+    "refundableAmountBaseUnits": "0",
+    "blockNumber": "48236190",
+    "observedAt": "2026-10-17T12:37:48.750Z"
+  },
+  "adminRestartSubmitted": false,
+  "workerStarted": false,
+  "modelPricesAdded": false,
+  "applicationSourceChanged": false,
+  "serverStopped": true
+}

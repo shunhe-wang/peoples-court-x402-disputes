@@ -1,0 +1,65 @@
+{
+  "at": "2026-10-17T13:46:34.523Z",
+  "httpStatus": 200,
+  "response": {
+    "ok": true,
+    "data": {
+      "receiptReconciliation": {
+        "completed": [],
+        "failed": []
+      },
+      "scanned": 0,
+      "advanced": [],
+      "closedAppealBriefings": [],
+      "proceduralRequests": {
+        "scanned": 0,
+        "decided": [],
+        "routed": [],
+        "failed": []
+      },
+      "additionalAwards": {
+        "scanned": 1,
+        "attempted": [],
+        "issued": [],
+        "denied": [],
+        "failed": []
+      },
+      "executedAwards": [
+        "dis_15b1be10-b232-4e44-9b20-4a50df8ad6ce"
+      ],
+      "releaseEffects": {
+        "attempted": 0,
+        "delivered": 0,
+        "pending": 0,
+        "deadLetter": 0
+      },
+      "notificationProjection": {
+        "considered": 0,
+        "projected": 0,
+        "notificationsCreated": 0,
+        "failed": 0
+      },
+      "notifications": {
+        "processed": 0,
+        "accepted": 0,
+        "failed": 0,
+        "reconciliation": "completed"
+      },
+      "deadlineReminders": {
+        "scanned": 1,
+        "queued": 0,
+        "skipped": 0,
+        "failed": 0,
+        "wrapped": true
+      },
+      "runRecovery": {
+        "interrupted": [],
+        "requeued": [],
+        "parked": []
+      },
+      "operationalAlerts": [],
+      "busy": [],
+      "errors": []
+    }
+  }
+}
