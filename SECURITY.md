@@ -14,6 +14,10 @@ Do not use the current package to claim automatic refunds, custody, escrow prote
 The validators reject unknown fields, malformed identifiers, non-canonical timestamps, unsafe URLs, oversized packets, unsupported claims, unsupported execution modes, invalid hashes, and cross-transaction artifact mismatches.
 
 Resource server hooks abort verification and settlement when the required acceptance is missing or does not match the exact declaration, resource, and selected payment requirement.
+The expected resource URL must come from explicit server `resourceUrl` configuration, not the client payload.
+A resolver may select a configured URL using transport context, but request-derived URLs and headers are not trusted configuration.
+Missing configuration aborts, including for the exported unconfigured singleton.
+Thrown validation/proof/resolver exceptions are converted to generic explicit aborts because x402 may otherwise continue after a thrown hook error.
 
 The hosted filing adapter reverifies packet integrity before preparing a filing and again before filing the packet exhibit.
 The hosted People’s Court service does not parse or verify the packet; it stores the packet hash in the confirmed filing’s metadata and the exhibit bytes as claimant evidence.
@@ -41,6 +45,7 @@ The package validates acceptance structure and transaction bindings.
 Cryptographic or durable clickthrough verification is application-specific.
 
 Production resource servers should provide `verifyAcceptanceProof`.
+It must return exactly `true`; false, non-boolean values, and exceptions abort both verification and settlement.
 
 The People’s Court API separately requires a registered claimant consent record for the same transaction, parties, Rules, and procedure terms, and the claimant’s hosted acceptance of the exact filing.
 It does not compare that record with the packet’s acceptance artifact; register the consent record with the packet’s acceptance artifact hash and declaration terms hash so the two can be reconciled.
