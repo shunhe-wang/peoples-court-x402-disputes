@@ -38,3 +38,13 @@ export function decimalAmountMatchesNumber(
     normalizedAmount === normalizedValue
   );
 }
+
+/** Converts a plain USD decimal string to whole cents, or null when it is not representable. */
+export function usdDecimalToMinorUnits(amount: string): string | null {
+  const normalized = normalizePlainDecimal(amount);
+  if (normalized === null) return null;
+  const [whole = "0", fraction = ""] = normalized.split(".");
+  if (fraction.length > 2) return null;
+  const cents = BigInt(whole) * 100n + BigInt(fraction.padEnd(2, "0") || "0");
+  return cents.toString();
+}

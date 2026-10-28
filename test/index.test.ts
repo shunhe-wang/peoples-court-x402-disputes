@@ -26,6 +26,7 @@ import {
   verifyAcceptanceBindings,
   verifyX402DisputePacketIntegrity,
   type PeopleCourtDisputeDeclarationV1,
+  type PeopleCourtPartnerTransport,
   type X402DisputePacketV1,
 } from "../src/index.js";
 import type {
@@ -188,6 +189,51 @@ function settlement(
     transaction: TX_HASH,
     network: requirement.network,
     settledAt,
+  };
+}
+
+function filingInput(
+  packet: X402DisputePacketV1,
+  idempotencyKey: string,
+): Parameters<
+  ReturnType<typeof createPeopleCourtAdjudicationAdapter>["prepare"]
+>[0] {
+  return {
+    packet,
+    idempotencyKey,
+    externalCaseId: TRANSACTION_ID,
+    policyVersion: "policy-v1",
+    authorityGrantId: "authority-v1",
+    consentArtifactIds: { claimant: "claimant-consent" },
+    claimantAcceptanceIdentity: { email: "buyer@example.test" },
+    intakeMode: "claimant_initiated",
+    confirmationPolicy: { mode: "initiator_only" },
+    summary: "The purchased service did not perform.",
+    parties: {
+      claimant: { externalId: BUYER, name: "Buyer", principalKind: "individual" },
+      respondent: {
+        externalId: SELLER,
+        name: "Seller",
+        principalKind: "organization",
+      },
+    },
+    claim: {
+      statement: "The agreed result was not delivered.",
+      requestedOutcome: "refund",
+    },
+  };
+}
+
+function unusedTransport(): PeopleCourtPartnerTransport {
+  const fail = async (): Promise<never> => {
+    throw new Error("The Partner API transport must not be called.");
+  };
+  return {
+    prepareFiling: fail,
+    getFiling: fail,
+    confirmFiling: fail,
+    getCase: fail,
+    getServedAward: fail,
   };
 }
 
@@ -507,43 +553,13 @@ async function x402rCompositionContract(): Promise<void> {
   assert.equal(packet.executionMode, "x402r");
   assert.equal((await verifyX402DisputePacketIntegrity(packet)).valid, true);
 
-  const adapter = createPeopleCourtAdjudicationAdapter({
-    async prepareFiling() {
-      throw new Error("The Partner API transport must not be called for x402r.");
-    },
-    async confirmFiling() {
-      throw new Error("The Partner API transport must not be called for x402r.");
-    },
-    async getCase(caseId) {
-      return { data: { caseId } };
-    },
-    async getServedAward(caseId) {
-      return { data: { caseId } };
-    },
-  });
+  const adapter = createPeopleCourtAdjudicationAdapter(unusedTransport());
   await assert.rejects(
-    () =>
-      adapter.prepare({
-        packet,
-        idempotencyKey: "prepare-x402r-0001",
-        externalCaseId: TRANSACTION_ID,
-        policyVersion: "policy-v1",
-        authorityGrantId: "authority-v1",
-        consentArtifactIds: {
-          claimant: "claimant-consent",
-          respondent: "respondent-consent",
-        },
-        summary: "The x402r transaction is disputed.",
-        amount: { value: 250, currency: "USD" },
-        parties: {
-          claimant: { externalId: BUYER, name: "Buyer" },
-          respondent: { externalId: SELLER, name: "Seller" },
-        },
-        claim: {
-          statement: "The x402r resource was not delivered.",
-          requestedOutcome: "refund",
-        },
-      }),
+    () => adapter.prepare(filingInput(packet, "prepare-x402r-0001")),
+    /existing x402r referral path/,
+  );
+  await assert.rejects(
+    () => adapter.submitPacketEvidence("pcase_x402r", { packet }, "evidence-x402r-0001"),
     /existing x402r referral path/,
   );
 }
@@ -662,39 +678,70 @@ async function signedArtifactContract(): Promise<void> {
 }
 
 async function adapterContract(packet: X402DisputePacketV1): Promise<void> {
-  const calls: Array<{ operation: string; value: unknown }> = [];
+  const calls: Array<{ operation: string; key?: string; value: unknown }> = [];
+  const draft = {
+    draftId: "pfd_test",
+    reservedCaseId: "pcase_test",
+    externalCaseId: TRANSACTION_ID,
+    status: "awaiting_confirmations",
+    draftDigest: "e".repeat(64),
+    expiresAt: "2026-07-29T12:30:00.000Z",
+    rules: { version: "0.21", hash: "a".repeat(64) },
+    fee: {},
+    participants: [
+      {
+        participantId: "pcase_test:claimant",
+        side: "claimant" as const,
+        principalId: BUYER,
+        agentId: "merchant-agent",
+      },
+      {
+        participantId: "pcase_test:respondent",
+        side: "respondent" as const,
+        principalId: SELLER,
+      },
+    ],
+    confirmations: [
+      {
+        participantId: "pcase_test:respondent",
+        side: "respondent" as const,
+        required: false,
+        status: "not_required",
+        confirmationStatement: "Respondent statement.",
+      },
+      {
+        participantId: "pcase_test:claimant",
+        side: "claimant" as const,
+        required: true,
+        status: "pending",
+        confirmationStatement: "Server-issued claimant statement.",
+      },
+    ],
+  };
   const adapter = createPeopleCourtAdjudicationAdapter({
     async prepareFiling(value, key) {
-      calls.push({ operation: key, value });
-      return {
-        data: {
-          draftId: "pfd_test",
-          reservedCaseId: "pcase_test",
-          draftDigest: "e".repeat(64),
-          confirmationStatement: "Confirm the exact filing.",
-          expiresAt: "2026-07-29T12:30:00.000Z",
-          rules: { version: "0.21", hash: "a".repeat(64) },
-          fee: {},
-        },
-      };
+      calls.push({ operation: "prepare", key, value });
+      return { data: draft };
     },
-    async confirmFiling(_draftId, value, key) {
-      calls.push({ operation: key, value });
+    async getFiling(draftId) {
+      calls.push({ operation: "getFiling", value: draftId });
+      return { data: draft };
+    },
+    async confirmFiling(draftId, value, key) {
+      calls.push({ operation: "confirm", key, value: { draftId, value } });
       return {
         data: {
           caseId: "pcase_test",
-          externalCaseId: "merchant-order-0001",
+          externalCaseId: TRANSACTION_ID,
           status: "awaiting_party_response",
-          accessSide: "claimant",
-          rulesVersion: "0.21",
-          rulesHash: "a".repeat(64),
+          rules: { version: "0.21", hash: "a".repeat(64) },
           createdAt: NOW.toISOString(),
         },
       };
     },
     async submitEvidence(caseId, value, key) {
-      calls.push({ operation: key, value: { caseId, value } });
-      return { accepted: true };
+      calls.push({ operation: "evidence", key, value: { caseId, value } });
+      return { data: { accepted: true } };
     },
     async getCase(caseId) {
       return { data: { caseId } };
@@ -704,33 +751,59 @@ async function adapterContract(packet: X402DisputePacketV1): Promise<void> {
     },
   });
   const prepared = await adapter.prepare({
-    packet,
-    idempotencyKey: "prepare-order-0001",
-    externalCaseId: TRANSACTION_ID,
-    policyVersion: "policy-v1",
-    authorityGrantId: "authority-v1",
-    consentArtifactIds: {
-      claimant: "claimant-consent",
-      respondent: "respondent-consent",
-    },
-    summary: "The purchased service did not perform.",
-    amount: { value: 250, currency: "USD" },
-    parties: {
-      claimant: { externalId: BUYER, name: "Buyer" },
-      respondent: { externalId: SELLER, name: "Seller" },
-    },
-    claim: {
-      statement: "The agreed result was not delivered.",
-      requestedOutcome: "refund",
-    },
+    ...filingInput(packet, "prepare-order-0001"),
+    metadata: { merchantOrder: "0001" },
   });
   assert.equal(prepared.draftId, "pfd_test");
-  const transportInput = calls[0]?.value as {
-    transactionId: string;
-    x402DisputePacket: X402DisputePacketV1;
-  };
+  const transportInput = calls[0]?.value as Record<string, unknown>;
+  assert.equal(calls[0]?.key, "prepare-order-0001");
   assert.equal(transportInput.transactionId, TRANSACTION_ID);
-  assert.equal(transportInput.x402DisputePacket.packetHash, packet.packetHash);
+  assert.equal("x402DisputePacket" in transportInput, false);
+  assert.equal("amount" in transportInput, false);
+  assert.equal("packet" in transportInput, false);
+  // The packet's disputed USD 250 becomes canonical minor units.
+  assert.deepEqual(transportInput.claimAmount, {
+    currency: "USD",
+    minorUnits: "25000",
+  });
+  assert.deepEqual(transportInput.metadata, {
+    merchantOrder: "0001",
+    "x402.transactionId": TRANSACTION_ID,
+    "x402.packetHash": packet.packetHash,
+    "x402.packetVersion": String(packet.version),
+  });
+
+  const confirmed = await adapter.confirm("pfd_test", {
+    confirmationReference: "x402:merchant-order-0001",
+    idempotencyKey: "confirm-order-0001",
+  });
+  assert.equal(confirmed.caseId, "pcase_test");
+  assert.deepEqual(calls.at(-1), {
+    operation: "confirm",
+    key: "confirm-order-0001",
+    value: {
+      draftId: "pfd_test",
+      value: {
+        participantId: "pcase_test:claimant",
+        draftDigest: "e".repeat(64),
+        confirmationStatement: "Server-issued claimant statement.",
+        actorId: "merchant-agent",
+        principalId: BUYER,
+        confirmationMethod: "protocol_act",
+        confirmationReference: "x402:merchant-order-0001",
+      },
+    },
+  });
+
+  await assert.rejects(
+    () =>
+      adapter.prepare({
+        ...filingInput(packet, "prepare-reserved-metadata"),
+        metadata: { "x402.packetHash": "f".repeat(64) },
+      }),
+    /reserved for the packet binding/,
+  );
+
   const agentSignaturePacket = structuredClone(packet);
   agentSignaturePacket.acceptance.proof.method = "agent_signature";
   agentSignaturePacket.acceptance.proof.signature = {
@@ -742,36 +815,52 @@ async function adapterContract(packet: X402DisputePacketV1): Promise<void> {
   );
   await assert.rejects(
     () =>
-      adapter.prepare({
-        packet: agentSignaturePacket,
-        idempotencyKey: "prepare-agent-signature-unsupported",
-        externalCaseId: TRANSACTION_ID,
-        policyVersion: "policy-v1",
-        authorityGrantId: "authority-v1",
-        consentArtifactIds: {
-          claimant: "claimant-consent",
-          respondent: "respondent-consent",
-        },
-        summary: "The purchased service did not perform.",
-        amount: { value: 250, currency: "USD" },
-        parties: {
-          claimant: { externalId: BUYER, name: "Buyer" },
-          respondent: { externalId: SELLER, name: "Seller" },
-        },
-        claim: {
-          statement: "The agreed result was not delivered.",
-          requestedOutcome: "refund",
-        },
-      }),
+      adapter.prepare(
+        filingInput(agentSignaturePacket, "prepare-agent-signature-unsupported"),
+      ),
     /supports only clickthrough and signed_document/,
   );
+
   assert.deepEqual(
-    await adapter.submitEvidence(
+    await adapter.submitPacketEvidence(
       "pcase_test",
-      { brief: "Additional protocol evidence." },
+      { packet },
       "evidence-order-0001",
     ),
     { accepted: true },
+  );
+  const exhibit = (
+    calls.at(-1)?.value as {
+      caseId: string;
+      value: {
+        party: string;
+        brief: string;
+        files: Array<{ filename: string; mediaType: string; bytes: Uint8Array }>;
+      };
+    }
+  ).value;
+  assert.equal(exhibit.party, "claimant");
+  assert.match(exhibit.brief, new RegExp(packet.packetHash));
+  assert.match(exhibit.brief, /did not independently verify/);
+  assert.equal(exhibit.files.length, 1);
+  assert.equal(exhibit.files[0]?.mediaType, "text/plain");
+  assert.match(exhibit.files[0]?.filename ?? "", /^x402-dispute-packet-[0-9a-f]{16}\.txt$/);
+  const filed = JSON.parse(
+    new TextDecoder().decode(exhibit.files[0]?.bytes),
+  ) as X402DisputePacketV1;
+  assert.deepEqual(filed, packet);
+  assert.equal(
+    await canonicalSha256(packetHashPayload(filed)),
+    packet.packetHash,
+  );
+  const tamperedExhibit = structuredClone(packet);
+  tamperedExhibit.transactionId = "merchant-order-9999";
+  await assert.rejects(() =>
+    adapter.submitPacketEvidence(
+      "pcase_test",
+      { packet: tamperedExhibit },
+      "evidence-tampered",
+    ),
   );
   assert.deepEqual(await adapter.getServedAward("pcase_test"), {
     caseId: "pcase_test",
@@ -869,30 +958,11 @@ async function adapterContract(packet: X402DisputePacketV1): Promise<void> {
     /exact declared execution owner/,
   );
 
+  const mismatch = filingInput(packet, "prepare-order-mismatch");
+  mismatch.parties.respondent.externalId = "another-seller";
   await assert.rejects(
-    () =>
-      adapter.prepare({
-        packet,
-        idempotencyKey: "prepare-order-mismatch",
-        externalCaseId: TRANSACTION_ID,
-        policyVersion: "policy-v1",
-        authorityGrantId: "authority-v1",
-        consentArtifactIds: {
-          claimant: "claimant-consent",
-          respondent: "respondent-consent",
-        },
-        summary: "Mismatch",
-        amount: { value: 251, currency: "USD" },
-        parties: {
-          claimant: { externalId: BUYER, name: "Buyer" },
-          respondent: { externalId: SELLER, name: "Seller" },
-        },
-        claim: {
-          statement: "Mismatch",
-          requestedOutcome: "refund",
-        },
-      }),
-    /filing amount does not match/,
+    () => adapter.prepare(mismatch),
+    /filing parties do not match/,
   );
 }
 

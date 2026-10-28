@@ -30,7 +30,8 @@ assert.match(
 
 function assertHostedRulesDiscovery(readme, source) {
   const sellerDeclaration = readme.match(/## Seller declaration([\s\S]*?)## Payer acceptance/)?.[1] ?? "";
-  assert.match(sellerDeclaration, /\/api\/v2\/rules\/current/, `${source} discovers the current Rules tuple`);
+  assert.match(sellerDeclaration, /\/api\/rules\/current/, `${source} discovers the current Rules tuple`);
+  assert.doesNotMatch(sellerDeclaration, /\/api\/v[12]\//, `${source} does not use a retired API version URL`);
   for (const assignment of [
     "id: currentRules.rulesetId",
     "version: currentRules.rulesVersion",

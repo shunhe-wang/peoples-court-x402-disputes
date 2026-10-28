@@ -21,7 +21,7 @@ export async function prepareOrdinaryX402Dispute(input: {
   policyVersion: string;
   authorityGrantId: string;
   claimantConsentId: string;
-  respondentConsentId: string;
+  claimantEmail: string;
 }) {
   const packet = await buildX402DisputePacket({
     paymentRequired: input.paymentRequired,
@@ -41,20 +41,21 @@ export async function prepareOrdinaryX402Dispute(input: {
     externalCaseId: packet.transactionId,
     policyVersion: input.policyVersion,
     authorityGrantId: input.authorityGrantId,
-    consentArtifactIds: {
-      claimant: input.claimantConsentId,
-      respondent: input.respondentConsentId,
-    },
+    consentArtifactIds: { claimant: input.claimantConsentId },
+    claimantAcceptanceIdentity: { email: input.claimantEmail },
+    intakeMode: "claimant_initiated",
+    confirmationPolicy: { mode: "initiator_only" },
     summary: "The purchased x402 resource did not satisfy the declared terms.",
-    amount: { value: 25, currency: "USD" },
     parties: {
       claimant: {
         externalId: packet.parties.claimantId,
         name: "Buyer",
+        principalKind: "individual",
       },
       respondent: {
         externalId: packet.parties.respondentId,
         name: "Seller",
+        principalKind: "organization",
       },
     },
     claim: {

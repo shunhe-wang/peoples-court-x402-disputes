@@ -15,7 +15,7 @@ It does not decide a dispute or execute an award.
 - Packet version: `1`
 - Supported x402 version: `2`
 - CI-tested x402 package lines: `2.19.x` and `2.20.x`; the development pair and release validation also cover `2.25.x`
-- Package version: `0.1.1`
+- Package version: `0.2.0`
 
 Unknown fields fail validation.
 
@@ -106,8 +106,8 @@ EIP-712 artifacts are verified locally every time packet integrity is checked.
 
 JWS artifacts are locally verified only when the caller supplies a trusted verifier on both construction and every later integrity check.
 
-The current Partner API service does not have a trusted JWS identity-verification policy.
-It therefore rejects packets that claim a JWS artifact is verified; use EIP-712 for reproducibly verified Partner API artifacts.
+The hosted People’s Court service does not have a trusted JWS identity-verification policy.
+The hosted filing adapter therefore refuses packets that claim a JWS artifact is verified; use EIP-712 for artifacts anyone can reverify.
 
 Verification checks the artifact signature and its resource, payment, payer, network, transaction, and timing bindings as applicable.
 Receipt payer and transaction identifiers match byte-for-byte, except that `0x`-prefixed hexadecimal identifiers on the `eip155` namespace may differ in hex-letter case.
@@ -147,7 +147,7 @@ An ordinary packet v1 must use `partner_executes`.
 
 An x402r packet must use `rail: "x402r"` and `executionMode: "x402r"`.
 
-The Partner API adjudication adapter refuses x402r packets because the existing signed x402r referral is the authoritative filing and execution path.
+The hosted filing adapter refuses x402r packets because the existing signed x402r referral is the authoritative filing and execution path.
 
 The packet v1 declaration permits only `partner_executes` and `x402r`.
 
@@ -186,23 +186,25 @@ that JSON Schema cannot express or that validators may implement differently.
 Consumers of the exported schema should enable standard `uri` and `date-time`
 format validation.
 
-## Partner API binding
+## Hosted filing binding
 
-The optional `x402DisputePacket` field is an additive extension to Partner API version `2026-07-23`.
+The hosted People’s Court API has no packet field.
+The adapter maps a verified packet onto the canonical filing operations:
 
-When present, the server:
+1. `POST /api/filings` with `transactionId` and `claimAmount` (USD minor units) taken from the packet, and filing `metadata` entries `x402.transactionId`, `x402.packetHash`, and `x402.packetVersion`;
+2. the claimant’s hosted acceptance of the exact filing packet;
+3. `POST /api/filings/{id}/confirmations` with the participant ID and confirmation statement returned by `GET /api/filings/{id}`; and
+4. in the evidence stage, `POST /api/cases/{id}/submissions` with the packet’s canonical JSON as a claimant evidence file.
 
-1. validates the strict packet structure and canonical integrity;
-2. rejects x402r packets on the Partner API path;
-3. matches transaction, parties, amount, provider, Rules, terms, scope, acceptance method, and acceptance artifact to stored records;
-4. includes the packet in the prepared filing digest;
-5. requires a second exact confirmation;
-6. stores the canonical packet as case evidence and retains its original bytes; and
-7. returns the packet hash on case reads.
+The server’s prepared draft digest covers the filing metadata, so the confirmed filing commits to the packet hash.
+The server stores that metadata with the case.
+It does not parse, validate, or verify the packet itself.
 
-The existing policy, authority grant, claimant consent, and respondent consent remain mandatory.
-
+The existing policy, authority grant, claimant consent, hosted acceptance, and exact confirmation remain mandatory.
 The packet does not replace any of them.
+
+An earlier draft of this document described server-side packet validation.
+That server change was never deployed.
 
 ## Evidence semantics
 
@@ -215,6 +217,8 @@ An acceptance artifact is evidence of the recorded acceptance act.
 None of these artifacts is a merits finding, proof of satisfactory performance, proof of delegated authority, proof of notice, or a guarantee that an award can be executed.
 
 The adjudicator determines weight and merits under the applicable Rules.
+
+A `verified` label in a filed packet records the result of the claimant’s software, not a People’s Court finding.
 
 ## Reference implementation crosswalk
 
