@@ -52,7 +52,8 @@ jobs:
           fi
       - run: npm ci
       - run: npm run check
-      - run: npm audit --audit-level=moderate
+      - name: Audit dependencies
+        run: npm run audit:gate
       - name: Confirm this version is unpublished
         run: |
           PACKAGE_NAME="$(node -p "require('./package.json').name")"

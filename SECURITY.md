@@ -90,6 +90,17 @@ packet, and rejects an adapter whose execution mode or exact declared owner
 identity does not match.
 It is never triggered by case status alone.
 
+## Dependency advisories
+
+The package declares no dependencies of its own; `@x402/core` and `@x402/extensions` are peers that you install, and the SDK loads them at runtime.
+Every supported x402 line depends on zod 3, which is affected by GHSA-mrhx-c7xc-m3w5 (memory exhaustion while validating oversized constrained collections, fixed in zod 4.6.6).
+The SDK does not import zod directly, but the x402 modules it imports load it.
+If your server validates untrusted input with x402 schemas, bound request sizes until x402 moves to zod 4.
+
+Releases run `scripts/audit-gate.mjs` over this repository’s lockfile, which pins x402 2.25.0.
+It blocks on every moderate or higher advisory except the zod one above, which expires for review on 2027-01-31.
+It does not audit the 2.19 or 2.20 lines or the versions your own install resolves, and the packaging test installs peers without a lockfile; audit your own lockfile.
+
 ## Operational requirements before production use
 
 - Publish releases with protected provenance.
