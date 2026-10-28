@@ -1,0 +1,20 @@
+{
+  "caseId": "dis_15b1be10-b232-4e44-9b20-4a50df8ad6ce",
+  "approvedBy": "sw",
+  "approvalDate": "2026-10-17",
+  "changedAt": "2026-10-17T13:46:10.321Z",
+  "database": "tmp/kit2-verification.db.json",
+  "backup": "tmp/kit2-verification.db.before-stay-2026-10-17T13-46-10-321Z.json",
+  "backupSha256": "cb378e6b834e56d2696992dc1ba5abca94fd8ba70f9140a622ed7ffe18b93063",
+  "editedSha256": "220da69be7147ec82e4d4914907eaa0a81aa5a2a46613c1878dcc0c45c9a932a",
+  "changes": [
+    {
+      "path": "/dispositions/0/executeAfter",
+      "oldValue": "2026-10-24T13:42:34.587Z",
+      "newValue": "2026-10-17T13:45:10.322Z"
+    }
+  ],
+  "otherFieldsChanged": 0,
+  "pendingAppealOrPostAwardHolds": false,
+  "scope": "Verifies the executor and chain path, not Rules-path timing."
+}

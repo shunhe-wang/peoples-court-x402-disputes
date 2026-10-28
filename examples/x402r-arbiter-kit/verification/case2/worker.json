@@ -1,0 +1,87 @@
+{
+  "providerConfiguration": [
+    {
+      "event": "merits.panel_configuration",
+      "provider": "zai",
+      "panelSeats": [
+        "glm-5.3-flash",
+        "glm-5.3-flash",
+        "glm-5.3-flash"
+      ],
+      "singleArbiter": "glm-5.3-flash",
+      "multimodal": "unset"
+    }
+  ],
+  "workerEvents": [
+    {
+      "level": "info",
+      "event": "worker.startup_ready",
+      "timestamp": "2026-10-17T13:41:26.448Z",
+      "fields": {
+        "durationMs": 17,
+        "attempt": 1
+      }
+    },
+    {
+      "level": "info",
+      "event": "worker.started",
+      "timestamp": "2026-10-17T13:41:26.448Z",
+      "fields": {
+        "apiOrigin": "http://localhost:3418",
+        "pollMs": 2000,
+        "pollTimeoutMs": 10000,
+        "processTimeoutMs": 2760000,
+        "processMaxWaitMs": 25000,
+        "heartbeatMs": 60000
+      }
+    },
+    {
+      "level": "info",
+      "event": "worker.run_started",
+      "timestamp": "2026-10-17T13:42:22.765Z",
+      "fields": {
+        "runId": "run_once_097f6fa6381bf0d85a154ad2c57c1d93",
+        "disputeId": "dis_15b1be10-b232-4e44-9b20-4a50df8ad6ce",
+        "attempt": 1
+      }
+    },
+    {
+      "level": "info",
+      "event": "worker.run_completed",
+      "timestamp": "2026-10-17T13:42:34.887Z",
+      "fields": {
+        "runId": "run_once_097f6fa6381bf0d85a154ad2c57c1d93",
+        "disputeId": "dis_15b1be10-b232-4e44-9b20-4a50df8ad6ce",
+        "status": "succeeded",
+        "durationMs": 12122
+      }
+    },
+    {
+      "level": "info",
+      "event": "worker.stopped",
+      "timestamp": "2026-10-17T13:45:46.393Z",
+      "fields": {
+        "reason": "aborted",
+        "signalReason": "SIGTERM"
+      }
+    }
+  ],
+  "usageSummary": {
+    "calls": 1,
+    "totalTokens": 4213
+  },
+  "settlementEvents": [
+    {
+      "level": "info",
+      "event": "settlement.execution_confirmed",
+      "timestamp": "2026-10-17T13:46:34.515Z",
+      "fields": {
+        "operationKey": "settlement:awd_f97bec58-d75d-45b7-82c1-14c76ba79be7:c9354075b25824992426fa4697b078c9d01043f9e9381cf8951474b853fa4fe9:f50420dfb39cfa059159e4e833981442d18bac772579a972ee35ce5bec83eb20:x402r:0x0158c673a6fdc2b235ea469b74fb6ddc7f174ede92771b19522bfecebcee94fd",
+        "adapter": "x402r",
+        "action": "void",
+        "attempts": 1,
+        "reconciled": false
+      }
+    }
+  ]
+}

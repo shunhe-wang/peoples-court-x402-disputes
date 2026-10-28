@@ -1,0 +1,126 @@
+{
+  "verifiedAt": "2026-10-17T13:45:23.689Z",
+  "caseId": "dis_15b1be10-b232-4e44-9b20-4a50df8ad6ce",
+  "dispositionId": "awd_f97bec58-d75d-45b7-82c1-14c76ba79be7",
+  "runId": "run_once_097f6fa6381bf0d85a154ad2c57c1d93",
+  "status": "served_awaiting_execution",
+  "releasedToParties": true,
+  "servedAt": "2026-10-17T13:42:34.587Z",
+  "originalExecuteAfter": "2026-10-24T13:42:34.587Z",
+  "originalStayHours": 168,
+  "allocation": [
+    {
+      "recipient": "claimant",
+      "amount": 0.01,
+      "timing": "immediate"
+    }
+  ],
+  "awardHash": "c9354075b25824992426fa4697b078c9d01043f9e9381cf8951474b853fa4fe9",
+  "signature": {
+    "signature": "0x33718d030502f42a37183ee3359fdabba6d4bf76aed4b788e0df669516fbac351c2248e8a6f1826e1c0d2c937009a17ecec9b7845914c55ee4bef92f01437aaf1b",
+    "signerAddress": "0xA64DC1d426ED26681508f2E99a600Cb46b217cbD",
+    "algorithm": "eip191",
+    "signedAt": "2026-10-17T13:42:34.848Z",
+    "signedHash": "c9354075b25824992426fa4697b078c9d01043f9e9381cf8951474b853fa4fe9"
+  },
+  "manifest": {
+    "recipeVersion": 3,
+    "manifestId": "amn_396608c4-93e5-4800-9ca2-95b4d13cc2d8",
+    "awardRevision": 1,
+    "rulesVersion": "1.1",
+    "disputeId": "dis_15b1be10-b232-4e44-9b20-4a50df8ad6ce",
+    "dispositionId": "awd_f97bec58-d75d-45b7-82c1-14c76ba79be7",
+    "createdAt": "2026-10-17T13:42:34.587Z",
+    "tribunalDesignation": "People's Court Tribunal 15B1BE10-B23-T1 (AI)",
+    "juridicalSeat": {
+      "city": "Wilmington",
+      "state": "Delaware",
+      "country": "United States",
+      "arbitrationLaw": "FAA",
+      "excludesStateArbitrationAct": "Delaware Uniform Arbitration Act",
+      "source": "rules_default"
+    },
+    "signatureAttributions": [
+      {
+        "signerId": "People's Court Tribunal 15B1BE10-B23-T1 (AI)",
+        "displayName": "People's Court Tribunal 15B1BE10-B23-T1 (AI)",
+        "title": "People's Court Tribunal (AI)",
+        "kind": "ai",
+        "signedAt": "2026-10-17T13:42:34.587Z"
+      }
+    ],
+    "artifacts": [
+      {
+        "artifactId": "art_amn_396608c4-93e5-4800-9ca2-95b4d13cc2d8_pdf",
+        "kind": "pdf",
+        "mediaType": "application/pdf",
+        "byteLength": 36207,
+        "sha256": "e92fb24bda0a1a472f12e529493eb6ae7f03a40aa6790e1013cfd8cfa7843521",
+        "canonical": true
+      },
+      {
+        "artifactId": "art_amn_396608c4-93e5-4800-9ca2-95b4d13cc2d8_docx",
+        "kind": "docx",
+        "mediaType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "byteLength": 11798,
+        "sha256": "ba8b99701f5e41ad75ee36b77cb68e09fc57f971427d348bb5eb2bab88945548",
+        "canonical": false
+      },
+      {
+        "artifactId": "art_amn_396608c4-93e5-4800-9ca2-95b4d13cc2d8_json",
+        "kind": "json",
+        "mediaType": "application/json",
+        "byteLength": 11572,
+        "sha256": "a3372411d84dc7be194caff12b6386a0a2afe46198a485ce741c47b8f48eec73",
+        "canonical": false
+      }
+    ]
+  },
+  "independentVerification": {
+    "manifestHashValid": true,
+    "signatureValid": true,
+    "trustAnchor": "Public address derived privately from the isolated app configured Award signing key, falling back to its arbiter key.",
+    "trustedSigner": "0xA64DC1d426ED26681508f2E99a600Cb46b217cbD",
+    "partyAuthenticatedDownloads": [
+      {
+        "kind": "pdf",
+        "httpStatus": 200,
+        "sha256": "e92fb24bda0a1a472f12e529493eb6ae7f03a40aa6790e1013cfd8cfa7843521",
+        "byteLength": 36207,
+        "verified": true
+      },
+      {
+        "kind": "docx",
+        "httpStatus": 200,
+        "sha256": "ba8b99701f5e41ad75ee36b77cb68e09fc57f971427d348bb5eb2bab88945548",
+        "byteLength": 11798,
+        "verified": true
+      },
+      {
+        "kind": "json",
+        "httpStatus": 200,
+        "sha256": "a3372411d84dc7be194caff12b6386a0a2afe46198a485ce741c47b8f48eec73",
+        "byteLength": 11572,
+        "verified": true
+      }
+    ]
+  },
+  "serverVerification": {
+    "manifestHashValid": true,
+    "signatureValid": true,
+    "artifacts": [
+      {
+        "kind": "pdf",
+        "valid": true
+      },
+      {
+        "kind": "docx",
+        "valid": true
+      },
+      {
+        "kind": "json",
+        "valid": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "verifiedAt": "2026-10-17T13:47:37.138Z",
+  "chainId": 84532,
+  "caseId": "dis_15b1be10-b232-4e44-9b20-4a50df8ad6ce",
+  "awardHash": "c9354075b25824992426fa4697b078c9d01043f9e9381cf8951474b853fa4fe9",
+  "status": "final_release_executed",
+  "allocation": [
+    {
+      "recipient": "claimant",
+      "amount": 0.01,
+      "timing": "immediate"
+    }
+  ],
+  "action": "void",
+  "paymentInfoHash": "0x0158c673a6fdc2b235ea469b74fb6ddc7f174ede92771b19522bfecebcee94fd",
+  "paymentInfo": {
+    "operator": "0x80754BA4594aF01726ee8ce80F30B5362227eca7",
+    "payer": "0x6da64CDC42A5D8458e993ac7ff0613c2DbA288F6",
+    "receiver": "0x3987aA8b081e0A5a6772842aBeF203e4B42B831b",
+    "token": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+    "maxAmount": "10000",
+    "preApprovalExpiry": 1792248087,
+    "authorizationExpiry": 1795009287,
+    "refundExpiry": 1795009287,
+    "minFeeBps": 0,
+    "maxFeeBps": 100,
+    "feeReceiver": "0x80754BA4594aF01726ee8ce80F30B5362227eca7",
+    "salt": "36874825972452834949231428247721743865175629509808980691244126894145018085146"
+  },
+  "holdSeconds": 2678400,
+  "contracts": {
+    "operator": "0x80754BA4594aF01726ee8ce80F30B5362227eca7",
+    "escrow": "0xBdEA0D1bcC5966192B070Fdf62aB4EF5b4420cff",
+    "refundRequest": "0x37ffe6eb9f57243e478C7B7bc23A8251E948baf4",
+    "refundRequestEvidence": "0xe388B6f6ED46310ECa5644D6A5218E284144c78A"
+  },
+  "before": {
+    "at": "2026-10-17T13:45:00.147Z",
+    "chainId": 84532,
+    "paymentInfoHash": "0x0158c673a6fdc2b235ea469b74fb6ddc7f174ede92771b19522bfecebcee94fd",
+    "paymentState": [
+      true,
+      "10000",
+      "0"
+    ]
+  },
+  "after": {
+    "paymentState": [
+      true,
+      "0",
+      "0"
+    ],
+    "observedAt": "2026-10-17T13:47:37.138Z"
+  },
+  "receipts": {
+    "authorization": {
+      "hash": "0xc8e59281281faffe54229c20903b85648441351a3ec9b03f4c846c72bf033c35",
+      "status": "success",
+      "blockNumber": "48238101",
+      "blockHash": "0xb56fd0a61cfdc57f33bf05bd1190a39de34592544c59670083292cd2669916e3",
+      "blockTimestamp": "2026-10-17T13:41:30.000Z",
+      "explorer": "https://sepolia.basescan.org/tx/0xc8e59281281faffe54229c20903b85648441351a3ec9b03f4c846c72bf033c35"
+    },
+    "refundRequest": {
+      "hash": "0xf5e73763b243ffaf06b1ea3084a3c838fa4f6018e4e1f5c02f1f48af9518b848",
+      "status": "success",
+      "blockNumber": "48238109",
+      "blockHash": "0xef1f88b85faa766d1ee981a9cce66718a288de47f96a45f05a7d4d1c7437e6d7",
+      "blockTimestamp": "2026-10-17T13:41:46.000Z",
+      "explorer": "https://sepolia.basescan.org/tx/0xf5e73763b243ffaf06b1ea3084a3c838fa4f6018e4e1f5c02f1f48af9518b848"
+    },
+    "evidence": {
+      "hash": "0xaeb8b205af17786260066e4a7ea12c6a24ad3dbb356354e0416d4af243643f71",
+      "status": "success",
+      "blockNumber": "48238111",
+      "blockHash": "0xbfe3824d10351a52bd520172ccbfa71d7ee8908da413252c6910b5b3951967ff",
+      "blockTimestamp": "2026-10-17T13:41:50.000Z",
+      "explorer": "https://sepolia.basescan.org/tx/0xaeb8b205af17786260066e4a7ea12c6a24ad3dbb356354e0416d4af243643f71"
+    },
+    "settlement": {
+      "hash": "0x42abd48f2c8eecfcb4d67319bb300efab495a99c0a1ff89656abe40e9a21f348",
+      "status": "success",
+      "blockNumber": "48238252",
+      "blockHash": "0xac8357dd952f7832b7cab931e67d740a9cafcf83604690ddd01da88966ff2997",
+      "blockTimestamp": "2026-10-17T13:46:32.000Z",
+      "explorer": "https://sepolia.basescan.org/tx/0x42abd48f2c8eecfcb4d67319bb300efab495a99c0a1ff89656abe40e9a21f348"
+    }
+  },
+  "settlement": {
+    "from": "0xa64dc1d426ed26681508f2e99a600cb46b217cbd",
+    "to": "0x80754ba4594af01726ee8ce80f30b5362227eca7",
+    "confirmations": "33",
+    "escrowEvent": {
+      "name": "PaymentVoided",
+      "paymentInfoHash": "0x0158c673a6fdc2b235ea469b74fb6ddc7f174ede92771b19522bfecebcee94fd",
+      "amount": "10000"
+    },
+    "usdcTransfer": {
+      "from": "0x5464155B2a9B3c0D844AF593fee60d0C4b3099E1",
+      "to": "0x6da64CDC42A5D8458e993ac7ff0613c2DbA288F6",
+      "value": "10000"
+    },
+    "awardAllocationMatches": true
+  },
+  "evidence": {
+    "submitter": "0x6da64CDC42A5D8458e993ac7ff0613c2DbA288F6",
+    "role": 0,
+    "sha256": "c4cb3a6f93981f08016ccee7809488a3bd56e3197d4a39fd9cbd12595bd33d1d"
+  }
+}
