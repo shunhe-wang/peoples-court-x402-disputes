@@ -358,6 +358,7 @@ export function createPeopleCourtDisputeResourceServerExtension(
     context: {
       paymentPayload: DeepReadonly<PaymentPayload>;
       requirements: DeepReadonly<PaymentRequirements>;
+      transportContext?: unknown;
     },
   ): Promise<
     | { ok: true; acceptance: PeopleCourtDisputeAcceptanceV1 }
@@ -374,8 +375,16 @@ export function createPeopleCourtDisputeResourceServerExtension(
     if (!acceptance) {
       return { ok: false, errors: ["Payment acceptance is required."] };
     }
-    const resourceUrl = context.paymentPayload.resource?.url;
-    if (!resourceUrl) {
+    const resourceUrl = typeof options.resourceUrl === "function"
+      ? await options.resourceUrl(context.transportContext)
+      : options.resourceUrl;
+    if (typeof resourceUrl !== "string" || !resourceUrl) {
+      return {
+        ok: false,
+        errors: ["A server-owned resource URL is required."],
+      };
+    }
+    if (context.paymentPayload.resource?.url !== resourceUrl) {
       return {
         ok: false,
         errors: ["The payment payload must echo the exact resource URL."],
@@ -394,7 +403,7 @@ export function createPeopleCourtDisputeResourceServerExtension(
     if (!bound.valid) return { ok: false, errors: bound.errors };
     if (
       options.verifyAcceptanceProof &&
-      !(await options.verifyAcceptanceProof(acceptance))
+      (await options.verifyAcceptanceProof(acceptance)) !== true
     ) {
       return {
         ok: false,
@@ -404,29 +413,34 @@ export function createPeopleCourtDisputeResourceServerExtension(
     return { ok: true, acceptance };
   };
 
+  // x402 dispatchers may log ordinary hook exceptions and continue processing.
+  // Convert every validation/resolver/proof exception to an explicit abort.
+  const beforePayment = async (
+    declaration: unknown,
+    context: Parameters<typeof validateContext>[1],
+  ) => {
+    try {
+      const result = await validateContext(declaration, context);
+      if (result.ok) return;
+      return {
+        abort: true as const,
+        reason: "peoples_court_dispute_acceptance_invalid",
+        message: result.errors.join("; ").slice(0, 1000),
+      };
+    } catch {
+      return {
+        abort: true as const,
+        reason: "peoples_court_dispute_acceptance_invalid",
+        message: "Payment acceptance validation failed.",
+      };
+    }
+  };
+
   return {
     key: PEOPLE_COURT_DISPUTE,
     hooks: {
-      onBeforeVerify: async (declaration, context) => {
-        const result = await validateContext(declaration, context);
-        if (!result.ok) {
-          return {
-            abort: true,
-            reason: "peoples_court_dispute_acceptance_invalid",
-            message: result.errors.join("; ").slice(0, 1000),
-          };
-        }
-      },
-      onBeforeSettle: async (declaration, context) => {
-        const result = await validateContext(declaration, context);
-        if (!result.ok) {
-          return {
-            abort: true,
-            reason: "peoples_court_dispute_acceptance_invalid",
-            message: result.errors.join("; ").slice(0, 1000),
-          };
-        }
-      },
+      onBeforeVerify: beforePayment,
+      onBeforeSettle: beforePayment,
     },
     enrichSettlementResponse: async (declarationValue, context) => {
       if (!context.result.success) return undefined;

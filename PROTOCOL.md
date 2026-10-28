@@ -65,8 +65,14 @@ The proof callback receives both the structured statement and a human-readable s
 It also receives the complete declaration and a fixed list of material limitations so the application can surface the forum URL, filing window, execution owner, refund limitation, authority gate, and evidentiary limits before payment.
 
 Resource server hooks validate the acceptance before both verification and settlement.
+Servers must configure `resourceUrl` as a server-owned advertised URL or a transport-context resolver selecting such a URL.
+Both the client’s resource echo and its acceptance must match that expected URL.
+The resolver receives only transport context, whose request-derived fields are not authoritative configuration.
+Missing/unusable configuration and thrown validation, resolver, or proof-verifier errors return an explicit abort; exceptions never escape into x402’s hook dispatcher.
+The unconfigured exported singleton therefore rejects acceptance.
 
 Applications that need cryptographic proof validation provide `verifyAcceptanceProof`.
+When supplied, that verifier must return exactly `true`.
 
 The general protocol supports `clickthrough`, `wallet_signature`,
 `agent_signature`, and `signed_document`.
@@ -104,6 +110,8 @@ The current Partner API service does not have a trusted JWS identity-verificatio
 It therefore rejects packets that claim a JWS artifact is verified; use EIP-712 for reproducibly verified Partner API artifacts.
 
 Verification checks the artifact signature and its resource, payment, payer, network, transaction, and timing bindings as applicable.
+Receipt payer and transaction identifiers match byte-for-byte, except that `0x`-prefixed hexadecimal identifiers on the `eip155` namespace may differ in hex-letter case.
+Solana/base58 identifiers and non-hexadecimal identifiers remain case-sensitive in receipt inspection and packet integrity checks.
 
 It does not establish that the signing key was authorized for a business identity unless the caller separately validates that authorization.
 

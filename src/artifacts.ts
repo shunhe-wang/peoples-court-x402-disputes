@@ -21,6 +21,7 @@ import type {
 } from "@x402/core/types";
 
 import { canonicalSha256 } from "./canonical.js";
+import { sameSettlementIdentifier } from "./identifiers.js";
 import type {
   InspectedOfferArtifact,
   VerifiedReceiptArtifact,
@@ -189,9 +190,9 @@ export async function inspectSignedReceipt(input: {
     payload.version !== 1 ||
     payload.resourceUrl !== input.resourceUrl ||
     payload.network !== input.network ||
-    payload.payer.toLowerCase() !== input.payer.toLowerCase() ||
+    !sameSettlementIdentifier(input.network, payload.payer, input.payer) ||
     (payloadTransaction.length > 0 &&
-      payloadTransaction.toLowerCase() !== input.transaction.toLowerCase()) ||
+      !sameSettlementIdentifier(input.network, payloadTransaction, input.transaction)) ||
     !Number.isSafeInteger(payload.issuedAt) ||
     payload.issuedAt > settledAtSeconds + 300 ||
     settledAtSeconds - payload.issuedAt > maxAgeSeconds;

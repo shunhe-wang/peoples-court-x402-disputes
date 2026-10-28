@@ -56,6 +56,7 @@ export const routeExtensions =
 
 export const serverExtension =
   createPeopleCourtDisputeResourceServerExtension({
+    resourceUrl: "https://merchant.example/api/report",
     verifyAcceptanceProof: async (acceptance) =>
       acceptance.proof.method === "clickthrough" &&
       acceptance.proof.artifactRef.startsWith("merchant://acceptance/"),
