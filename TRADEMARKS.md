@@ -11,4 +11,4 @@ certification, partnership, or endorsement without written permission.
 Forks and modified distributions should use a name and presentation that do
 not create confusion with the official People’s Court SDK or hosted service.
 
-Copyright 2026 Shunhe Wang.
+Copyright 2026 Epistemic Labs Inc.
