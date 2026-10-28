@@ -390,7 +390,7 @@ Read:
 
 ## License and product boundary
 
-Copyright 2026 Shunhe Wang.
+Copyright 2026 Epistemic Labs Inc.
 
 The files in this standalone SDK repository are licensed under the Apache
 License 2.0. That license covers the SDK source, examples, tests, conformance
